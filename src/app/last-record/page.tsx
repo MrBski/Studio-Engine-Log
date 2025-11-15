@@ -97,37 +97,59 @@ export default function LogActivityPage() {
   }
 
   const handleSaveToDevice = async () => {
-    if (!printRef.current) {
-        toast({
-            variant: "destructive",
-            title: 'Error',
-            description: 'Could not capture the log sheet.',
-        });
-        return;
+    const elementToCapture = printRef.current;
+    if (!elementToCapture) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Could not capture the log sheet.',
+      });
+      return;
     }
+
     toast({
-        title: 'Generating Image...',
-        description: 'Please wait while the log sheet is being captured.',
+      title: 'Generating Image...',
+      description: 'Please wait while the log sheet is being captured.',
     });
+
+    // Temporarily modify styles to capture full content
+    const originalStyle = {
+        maxHeight: elementToCapture.style.maxHeight,
+        overflowY: elementToCapture.style.overflowY,
+    };
+    elementToCapture.style.maxHeight = 'none';
+    elementToCapture.style.overflowY = 'visible';
+
     try {
-        const canvas = await html2canvas(printRef.current, { useCORS: true, scale: 2 });
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-        if (blob) {
-            const now = new Date();
-            const fileName = `EngineLog_${format(now, 'yyyy-MM-dd_HH-mm-ss')}.png`;
-            saveAs(blob, fileName);
-            toast({
-                title: 'Image Saved!',
-                description: 'The log sheet has been saved to your device.',
-            });
-        }
-    } catch (error) {
-        console.error("Failed to save image:", error);
+      const canvas = await html2canvas(elementToCapture, {
+        useCORS: true,
+        scale: 2,
+        // Allow canvas to expand to fit all content
+        height: elementToCapture.scrollHeight,
+        windowHeight: elementToCapture.scrollHeight,
+      });
+
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+      if (blob) {
+        const now = new Date();
+        const fileName = `EngineLog_${format(now, 'yyyy-MM-dd_HH-mm-ss')}.png`;
+        saveAs(blob, fileName);
         toast({
-            variant: "destructive",
-            title: 'Error Saving Image',
-            description: 'Could not generate the image. Please try again.',
+          title: 'Image Saved!',
+          description: 'The log sheet has been saved to your device.',
         });
+      }
+    } catch (error) {
+      console.error('Failed to save image:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error Saving Image',
+        description: 'Could not generate the image. Please try again.',
+      });
+    } finally {
+        // Restore original styles
+        elementToCapture.style.maxHeight = originalStyle.maxHeight;
+        elementToCapture.style.overflowY = originalStyle.overflowY;
     }
   };
   
