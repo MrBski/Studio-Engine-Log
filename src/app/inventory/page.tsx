@@ -121,22 +121,24 @@ function InventoryForm({ item, onSave, defaultCategory }: { item?: InventoryItem
 
 const InventoryList = ({ items, onEdit, onDelete }: { items: InventoryItem[], onEdit: (item: InventoryItem) => void, onDelete: (id: string) => void }) => {
   if (items.length === 0) {
-    return <p className="text-muted-foreground col-span-full text-center py-8">No inventory items found in this category.</p>;
+    return <p className="text-muted-foreground text-center py-8">No inventory items found in this category.</p>;
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 pt-6">
+    <div className="space-y-4 pt-6">
       {items.map((item) => (
-        <Card key={item.id} className="flex flex-col">
-          <CardHeader>
+        <Card key={item.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <CardHeader className="flex-1">
             <CardTitle>{item.name}</CardTitle>
             <CardDescription>{item.location}</CardDescription>
           </CardHeader>
-          <CardContent className="flex-grow">
-            <p className="text-3xl font-bold">{item.quantity} <span className="text-lg font-medium text-muted-foreground">{item.unit}</span></p>
-            <p className="text-xs text-muted-foreground pt-2">Last updated: {new Date(item.timestamp).toLocaleDateString()}</p>
+          <CardContent className="flex-1 pt-6 sm:pt-6 sm:flex sm:justify-center">
+            <div>
+              <p className="text-2xl font-bold">{item.quantity} <span className="text-base font-medium text-muted-foreground">{item.unit}</span></p>
+              <p className="text-xs text-muted-foreground pt-1">Last updated: {new Date(item.timestamp).toLocaleDateString()}</p>
+            </div>
           </CardContent>
-          <CardFooter className="flex justify-end gap-2">
+          <CardFooter className="flex-1 flex justify-end gap-2 pt-0 sm:pt-6">
              <DialogTrigger asChild>
               <Button variant="ghost" size="icon" onClick={() => onEdit(item)}>
                 <Edit className="h-4 w-4" />
