@@ -61,13 +61,10 @@ export default function PreviewPage() {
 
   const onSubmit = (data: any) => {
     try {
-      // Convert comma decimal separators to periods for JSON compatibility
-      const sanitizedData = JSON.parse(JSON.stringify(data).replace(/,/g, '.'));
-
       const performaData = {
-        nama: `Engine Log - ${format(new Date(sanitizedData.datetime), 'yyyy-MM-dd HH:mm')}`,
-        tanggal: new Date(sanitizedData.datetime).toISOString(),
-        keterangan: JSON.stringify(sanitizedData),
+        nama: `Engine Log - ${format(new Date(data.datetime), 'yyyy-MM-dd HH:mm')}`,
+        tanggal: new Date(data.datetime).toISOString(),
+        keterangan: JSON.stringify(data),
         jumlah: 1, // Represents one log entry
       };
 
@@ -90,7 +87,7 @@ export default function PreviewPage() {
 
   const renderInput = (name: any) => (
     <Input {...register(name, {
-        setValueAs: v => v.replace(',', '.') // ensure comma is treated as decimal point
+        setValueAs: v => String(v).replace(',', '.') // ensure comma is treated as decimal point
     })} type="tel" inputMode="decimal" className="bg-card-foreground/5 h-8 text-right text-sm" />
   );
 
