@@ -1,6 +1,6 @@
 'use client';
 
-import { useShip, useInventory, usePerforma, useEngineLog } from '@/hooks/use-app';
+import { useShip, useInventory, usePerforma, useSettings } from '@/hooks/use-app';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,20 +10,27 @@ import { importFromXlsx, exportToXlsx } from '@/lib/services/fileService';
 import { syncWithServer } from '@/lib/services/syncService';
 import { useRef, type ChangeEvent, useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import type { AppSettings } from '@/lib/types';
 
 export default function SettingsPage() {
   const { shipName, setShipName: setContextShipName } = useShip();
   const { inventory, setInventory } = useInventory();
   const { performaRecords, setPerformaRecords } = usePerforma();
+  const { settings, setSettings: setContextSettings } = useSettings();
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
-  // Local state for input to avoid updating context on every keystroke
   const [localShipName, setLocalShipName] = useState(shipName);
+  const [localSettings, setLocalSettings] = useState(settings);
 
   useEffect(() => {
     setLocalShipName(shipName);
   }, [shipName]);
+
+  useEffect(() => {
+    setLocalSettings(settings);
+  }, [settings]);
 
   const handleFileImport = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -87,6 +94,22 @@ export default function SettingsPage() {
     });
   }
 
+  const handleSettingsSave = () => {
+    setContextSettings(localSettings);
+    toast({
+      title: "Settings Updated",
+      description: "Calculation settings have been saved.",
+    });
+  };
+
+  const handleSettingsChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setLocalSettings(prev => ({
+      ...prev,
+      [name]: Number(value)
+    }));
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-2">
@@ -106,6 +129,22 @@ export default function SettingsPage() {
               <div className="flex gap-2">
                 <Input id="shipName" value={localShipName} onChange={(e) => setLocalShipName(e.target.value)} placeholder="e.g., MV Sea Pilot" />
                 <Button onClick={handleNameSave}>Save</Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Calculation Settings</CardTitle>
+            <CardDescription>Define multipliers for various calculations in the app.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="dailyTankMultiplier">Daily Tank Multiplier (cm to Ltrs)</Label>
+              <div className="flex gap-2">
+                <Input id="dailyTankMultiplier" name="dailyTankMultiplier" type="number" value={localSettings.dailyTankMultiplier} onChange={handleSettingsChange} placeholder="e.g., 21" />
+                <Button onClick={handleSettingsSave}>Save</Button>
               </div>
             </div>
           </CardContent>

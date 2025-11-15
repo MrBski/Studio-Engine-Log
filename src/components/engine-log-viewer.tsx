@@ -6,6 +6,7 @@ import React from 'react';
 import { format, parseISO, isValid } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useSettings } from '@/hooks/use-app';
 
 const SectionTitle = ({ children, className }: { children: React.ReactNode; className?: string }) => (
   <h3 className={cn("font-bold text-center p-1.5 my-2 rounded-md text-primary-foreground text-xs", className)}>
@@ -47,6 +48,9 @@ const DataCell = ({ children, className, span = 1 }: { children: React.ReactNode
 
 
 export function EngineLogViewer({ data }: { data: any }) {
+  const { settings } = useSettings();
+  const { dailyTankMultiplier } = settings;
+
   if (!data) return null;
   
   const parsedDate = data.datetime ? (typeof data.datetime === 'string' ? parseISO(data.datetime) : new Date(data.datetime)) : null;
@@ -55,10 +59,11 @@ export function EngineLogViewer({ data }: { data: any }) {
 
   const flowmeterUsage = (data.flowmeter?.after ?? 0) - (data.flowmeter?.before ?? 0);
   const dailyUsageCm = (data.daily?.after ?? 0) - (data.daily?.before ?? 0);
-  const dailyUsageLtrs = dailyUsageCm * 21;
+  const dailyUsageLtrs = dailyUsageCm * dailyTankMultiplier;
   const usageDifference = dailyUsageLtrs - flowmeterUsage;
-  const used4hoursCm = (data.onduty?.before ?? 0) - (data.daily?.before ?? 0);
-  const hourlyUsageLtrs = (used4hoursCm / 4) * 21;
+  
+  const used4hoursCm = data.used4hours ?? 0;
+  const hourlyUsageLtrs = (used4hoursCm / 4) * dailyTankMultiplier;
   const roundedHourlyUsage = Math.round(hourlyUsageLtrs);
   
   const rob = data.rob ?? 0;
@@ -142,8 +147,8 @@ export function EngineLogViewer({ data }: { data: any }) {
                            <DataCell className="text-muted-foreground">AFTER</DataCell>
                            <DataCell>{(data.daily.before ?? 0).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell>{(data.daily.after ?? 0).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{((data.daily.before ?? 0) * 21).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{((data.daily.after ?? 0) * 21).toFixed(1).replace('.',',')}</DataCell>
+                           <DataCell>{((data.daily.before ?? 0) * dailyTankMultiplier).toFixed(1).replace('.',',')}</DataCell>
+                           <DataCell>{((data.daily.after ?? 0) * dailyTankMultiplier).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell span={2} className="bg-purple-800/50 h-6 rounded-sm">{(dailyUsageCm).toFixed(1).replace('.',',')} cm</DataCell>
                            <DataCell span={2} className="bg-purple-800/50 h-6 rounded-sm mt-1">{(dailyUsageLtrs).toFixed(1).replace('.',',')} ltrs</DataCell>
                         </DataGrid>
@@ -153,7 +158,7 @@ export function EngineLogViewer({ data }: { data: any }) {
                 {data.flowmeter && (
                     <div className="space-y-1 p-1 border border-muted-foreground/50 rounded-sm">
                         <SectionTitle className="bg-cyan-500">FLOWMETER</SectionTitle>
-                        <DataGrid>
+                         <DataGrid>
                            <DataCell>{(data.flowmeter.before ?? 0).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell>{(data.flowmeter.after ?? 0).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell span={2} className="bg-green-800/50 h-6 rounded-sm">{(flowmeterUsage).toFixed(1).replace('.',',')}</DataCell>

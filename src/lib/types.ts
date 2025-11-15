@@ -38,6 +38,10 @@ export interface LastRecord {
     data?: any;
 }
 
+export interface AppSettings {
+  dailyTankMultiplier: number;
+}
+
 // Context types
 export type ShipContextType = {
   shipName: string;
@@ -64,4 +68,9 @@ export type PerformaContextType = {
 export type EngineLogContextType = {
   engineLogs: EngineLogRecord[];
   addEngineLog: (sections: EngineLogSection[]) => void;
+};
+
+export type SettingsContextType = {
+  settings: AppSettings;
+  setSettings: (settings: AppSettings) => void;
 };

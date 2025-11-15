@@ -5,6 +5,7 @@ import { ShipContext, type ShipContextType } from '@/context/ship-provider';
 import { InventoryContext, type InventoryContextType } from '@/context/inventory-provider';
 import { PerformaContext, type PerformaContextType } from '@/context/performa-provider';
 import { EngineLogContext, type EngineLogContextType } from '@/context/engine-log-provider';
+import { SettingsContext, type SettingsContextType } from '@/context/settings-provider';
 
 export const useShip = (): ShipContextType => {
   const context = useContext(ShipContext);
@@ -34,6 +35,14 @@ export const useEngineLog = (): EngineLogContextType => {
     const context = useContext(EngineLogContext);
     if (!context) {
         throw new Error('useEngineLog must be used within an EngineLogProvider');
+    }
+    return context;
+}
+
+export const useSettings = (): SettingsContextType => {
+    const context = useContext(SettingsContext);
+    if (!context) {
+        throw new Error('useSettings must be used within a SettingsProvider');
     }
     return context;
 }

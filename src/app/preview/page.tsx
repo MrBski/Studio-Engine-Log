@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { usePerforma } from '@/hooks/use-app';
+import { usePerforma, useSettings } from '@/hooks/use-app';
 import { Save, Camera as CameraIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -36,6 +36,8 @@ export default function PreviewPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { addPerformaRecord } = usePerforma();
+  const { settings } = useSettings();
+  const { dailyTankMultiplier } = settings;
   const printRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   
@@ -62,6 +64,7 @@ export default function PreviewPage() {
   const ondutyBefore = watch('onduty.before');
   const dailyBefore = watch('daily.before');
   const rob = watch('rob');
+  const used4hours = watch('used4hours');
 
   useEffect(() => {
     const now = new Date();
@@ -74,9 +77,11 @@ export default function PreviewPage() {
     const daily = parseFloat(String(dailyBefore).replace(',', '.')) || 0;
     const used = onduty - daily;
     setValue('used4hours', used);
+  }, [ondutyBefore, dailyBefore, setValue]);
 
-    const hourlyUsageCm = used / 4;
-    const hourlyUsageLtrs = hourlyUsageCm * 21;
+  useEffect(() => {
+    const hourlyUsageCm = (parseFloat(String(used4hours).replace(',', '.')) || 0) / 4;
+    const hourlyUsageLtrs = hourlyUsageCm * dailyTankMultiplier;
     const roundedHourlyUsage = Math.round(hourlyUsageLtrs);
     
     const initialRob = parseFloat(String(rob).replace(',', '.')) || 0;
@@ -92,8 +97,7 @@ export default function PreviewPage() {
         hour3: h3,
         hour4: h4,
     });
-
-  }, [ondutyBefore, dailyBefore, rob, setValue]);
+  }, [used4hours, rob, setValue, dailyTankMultiplier]);
 
 
   const onSubmit = (data: any) => {
@@ -311,4 +315,5 @@ export default function PreviewPage() {
   );
 
     
+
 
