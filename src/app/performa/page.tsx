@@ -4,12 +4,18 @@ import { useInventory, usePerforma, useEngineLog } from '@/hooks/use-app';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { History, Archive, Gauge, ClipboardList, FileJson } from 'lucide-react';
 import type { LastRecord } from '@/lib/types';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 export default function LastRecordPage() {
   const { inventory } = useInventory();
   const { performaRecords } = usePerforma();
   const { engineLogs } = useEngineLog();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
 
   const isJsonString = (str: string) => {
     try {
@@ -35,15 +41,18 @@ export default function LastRecordPage() {
       }
     }
     
-    if (performaRecords.length > 0) {
-       const lastPerf = [...performaRecords].sort((a,b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime())[0];
-      if (lastPerf) {
+    performaRecords.forEach(lastPerf => {
         let type: LastRecord['type'] = 'Performa';
         let summary = `Record "${lastPerf.nama}" for ${lastPerf.jumlah}`;
         
-        if (isJsonString(lastPerf.keterangan)) {
-          type = 'Engine Log';
-          summary = lastPerf.nama;
+        try {
+            const parsedKeterangan = JSON.parse(lastPerf.keterangan);
+            if (parsedKeterangan && typeof parsedKeterangan === 'object' && 'datetime' in parsedKeterangan) {
+              type = 'Engine Log';
+              summary = lastPerf.nama;
+            }
+        } catch (e) {
+            // Not a JSON string, treat as normal performa record
         }
 
         records.push({
@@ -52,8 +61,7 @@ export default function LastRecordPage() {
           summary: summary,
           timestamp: lastPerf.tanggal,
         });
-      }
-    }
+    });
     
     if (engineLogs.length > 0) {
         const lastEngineLog = engineLogs[0];
@@ -78,6 +86,24 @@ export default function LastRecordPage() {
         case 'Engine Log': return <FileJson className="h-4 w-4 text-muted-foreground" />;
         default: return null;
     }
+  }
+
+  if (!isClient) {
+    return (
+        <div className="space-y-8">
+            <div className="flex items-center gap-2">
+                <History className="h-6 w-6 text-primary" />
+                <h2 className="text-2xl font-headline font-bold text-foreground">Last Recorded Data</h2>
+            </div>
+            <div className="space-y-4">
+                <Card>
+                    <CardContent className="pt-6">
+                        <p className="text-muted-foreground text-center">Loading records...</p>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    );
   }
 
   return (
