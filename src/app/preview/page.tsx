@@ -115,6 +115,7 @@ export default function PreviewPage() {
         const canvas = await html2canvas(elementToCapture, { 
           useCORS: true, 
           scale: 2,
+          backgroundColor: '#262A34', // Same as dark card
           height: elementToCapture.scrollHeight,
           windowHeight: elementToCapture.scrollHeight,
         });
@@ -136,8 +137,10 @@ export default function PreviewPage() {
             description: 'Could not generate the image. Please try again.',
         });
     } finally {
-      elementToCapture.style.maxHeight = originalStyle.maxHeight;
-      elementToCapture.style.overflowY = originalStyle.overflowY;
+      if(elementToCapture) {
+        elementToCapture.style.maxHeight = originalStyle.maxHeight;
+        elementToCapture.style.overflowY = originalStyle.overflowY;
+      }
     }
   };
 
@@ -263,7 +266,6 @@ export default function PreviewPage() {
       </form>
 
       <div className="pt-8 fixed -right-full top-0">
-        <h2 className="text-xl font-bold text-center mb-4">Live Preview</h2>
         <div ref={printRef}>
           <EngineLogViewer data={watchedValues} />
         </div>
@@ -271,7 +273,3 @@ export default function PreviewPage() {
     </div>
   );
 }
-
-    
-
-    
