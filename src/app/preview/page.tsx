@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -46,7 +47,7 @@ export default function PreviewPage() {
     daily: { before: 64.5, after: 77.0 },
     onduty: { before: 77.0 },
     rob: 45914.0,
-    used4hours: 66.0,
+    used4hours: 0,
     user: { date: '', name: 'Mr. Basuki', position: '3/E' },
     condition: 'Engine Room in Good condition'
   };
@@ -56,12 +57,21 @@ export default function PreviewPage() {
   });
   
   const watchedValues = watch();
+  const ondutyBefore = watch('onduty.before');
+  const dailyBefore = watch('daily.before');
 
   useEffect(() => {
     const now = new Date();
     setValue('datetime', format(now, "yyyy-MM-dd'T'HH:mm"));
     setValue('user.date', format(now, 'MMMM d, yyyy'));
   }, [setValue]);
+
+  useEffect(() => {
+    const onduty = parseFloat(String(ondutyBefore).replace(',', '.')) || 0;
+    const daily = parseFloat(String(dailyBefore).replace(',', '.')) || 0;
+    setValue('used4hours', onduty - daily);
+  }, [ondutyBefore, dailyBefore, setValue]);
+
 
   const onSubmit = (data: any) => {
     try {
@@ -163,6 +173,10 @@ export default function PreviewPage() {
         setValueAs: v => parseFloat(String(v).replace(',', '.')) || 0
     })} type="tel" inputMode="decimal" className="bg-card-foreground/5 h-8 text-right text-sm" onKeyDown={handleKeyDown}/>
   );
+  
+  const renderReadOnlyInput = (name: any) => (
+    <Input {...register(name)} type="tel" className="bg-card-foreground/10 h-8 text-right text-sm font-bold" readOnly />
+  );
 
   return (
     <div className="space-y-4 pb-8">
@@ -235,7 +249,7 @@ export default function PreviewPage() {
                       <div className="space-y-3">
                          <SectionTitle className="bg-slate-500">Other</SectionTitle>
                           <DataRow label="RoB">{renderInput('rob')}</DataRow>
-                          <DataRow label="USED 4 Hours">{renderInput('used4hours')}</DataRow>
+                          <DataRow label="USED 4 Hours">{renderReadOnlyInput('used4hours')}</DataRow>
                       </div>
                       
                       <div className="pt-4 space-y-2">
@@ -272,4 +286,5 @@ export default function PreviewPage() {
       </div>
     </div>
   );
-}
+
+    
