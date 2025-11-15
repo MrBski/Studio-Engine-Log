@@ -11,15 +11,15 @@ const SectionTitle = ({ children, className }: { children: React.ReactNode; clas
   </h3>
 );
 
-const DataRow = ({ label, value }: { label: string, value: any }) => {
+const DataRow = ({ label, value, className }: { label: string, value: any, className?: string }) => {
     const displayValue = (val: any) => {
         if (val === null || val === undefined || val === '') return 'N/A';
-        // Check for object that is not null and not an array
+        if (typeof val === 'number') return val.toFixed(2);
         if (typeof val === 'object' && val !== null && !Array.isArray(val)) return JSON.stringify(val);
         return String(val);
     }
     return (
-        <div className="flex items-center border-b border-white/5 py-1">
+        <div className={cn("flex items-center border-b border-white/5 py-1", className)}>
             <label className="w-1/2 font-medium text-sm text-muted-foreground">{label}</label>
             <div className="w-1/2 text-right font-mono text-sm">{displayValue(value)}</div>
         </div>
@@ -32,6 +32,9 @@ export function EngineLogViewer({ data }: { data: any }) {
   
   const parsedDate = data.datetime ? (typeof data.datetime === 'string' ? parseISO(data.datetime) : new Date(data.datetime)) : null;
   const formattedDate = parsedDate && isValid(parsedDate) ? format(parsedDate, "Pp") : 'N/A';
+
+  const flowmeterUsage = data.flowmeter ? data.flowmeter.after - data.flowmeter.before : 0;
+  const dailyUsage = data.daily ? data.daily.after - data.daily.before : 0;
 
   return (
     <div className="space-y-4 pb-8 bg-card p-4 rounded-lg">
@@ -91,6 +94,7 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <SectionTitle className="bg-amber-600">Flowmeter</SectionTitle>
                     <DataRow label="Before" value={data.flowmeter.before} />
                     <DataRow label="After" value={data.flowmeter.after} />
+                    <DataRow label="Used" value={flowmeterUsage} className="font-bold text-accent-foreground bg-accent/20" />
                 </div>
                 )}
                 
@@ -99,6 +103,7 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <SectionTitle className="bg-purple-600">Daily</SectionTitle>
                     <DataRow label="Before" value={data.daily.before} />
                     <DataRow label="After" value={data.daily.after} />
+                    <DataRow label="Used" value={dailyUsage} className="font-bold text-accent-foreground bg-accent/20" />
                 </div>
                 )}
                 
