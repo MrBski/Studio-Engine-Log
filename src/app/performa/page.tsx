@@ -6,8 +6,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Trash2, Gauge, Ban, FileJson } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { EngineLogViewer } from '@/components/engine-log-viewer';
 
 const JsonViewer = ({ jsonData }: { jsonData: string }) => {
   let data;
@@ -20,15 +20,15 @@ const JsonViewer = ({ jsonData }: { jsonData: string }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm"><FileJson className="mr-2 h-4 w-4" /> View JSON</Button>
+        <Button variant="outline" size="sm"><FileJson className="mr-2 h-4 w-4" /> View Log</Button>
       </DialogTrigger>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle>JSON Data</DialogTitle>
-          <DialogDescription>Full data for this log entry.</DialogDescription>
+          <DialogTitle>Engine Log Details</DialogTitle>
+          <DialogDescription>Read-only view of the saved engine log.</DialogDescription>
         </DialogHeader>
-        <div className="max-h-[60vh] overflow-auto rounded-md bg-muted/50 p-4">
-            <pre className="text-xs whitespace-pre-wrap">{JSON.stringify(data, null, 2)}</pre>
+        <div className="max-h-[70vh] overflow-auto rounded-md bg-muted/20 p-2">
+            <EngineLogViewer data={data} />
         </div>
       </DialogContent>
     </Dialog>
@@ -43,6 +43,7 @@ export default function PerformaPage() {
   const sortedData = [...performaRecords].sort((a, b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime());
 
   const isJsonString = (str: string) => {
+    if (!str || typeof str !== 'string') return false;
     try {
       JSON.parse(str);
     } catch (e) {
@@ -144,5 +145,3 @@ export default function PerformaPage() {
     </div>
   );
 }
-
-    
