@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useForm, Controller }
-from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,9 +11,10 @@ import { useRouter } from 'next/navigation';
 import { usePerforma } from '@/hooks/use-app';
 import { Save } from 'lucide-react';
 import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
-const SectionTitle = ({ children }: { children: React.ReactNode }) => (
-  <h3 className="font-bold text-center bg-muted/50 p-2 my-2 rounded-md text-foreground text-sm">
+const SectionTitle = ({ children, className }: { children: React.ReactNode; className?: string }) => (
+  <h3 className={cn("font-bold text-center p-2 my-2 rounded-md text-primary-foreground text-sm", className)}>
     {children}
   </h3>
 );
@@ -106,7 +106,7 @@ export default function PreviewPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* LEFT COLUMN */}
                         <div className="space-y-3">
-                            <SectionTitle>M. E PORTSIDE</SectionTitle>
+                            <SectionTitle className="bg-destructive">M. E PORTSIDE</SectionTitle>
                             <DataRow label="RPM">{renderInput('portside.rpm')}</DataRow>
                             <DataRow label="L. O PRESS">{renderInput('portside.lo_press')}</DataRow>
                             <DataRow label="Exhaust">{renderInput('portside.exhaust')}</DataRow>
@@ -115,7 +115,7 @@ export default function PreviewPage() {
                             <DataRow label="F.W COOLERS">{renderInput('portside.fw_coolers')}</DataRow>
                             <DataRow label="L.O COOLERS">{renderInput('portside.lo_coolers')}</DataRow>
 
-                            <SectionTitle>M. E STARBOARD</SectionTitle>
+                            <SectionTitle className="bg-green-600">M. E STARBOARD</SectionTitle>
                             <DataRow label="RPM">{renderInput('starboard.rpm')}</DataRow>
                             <DataRow label="L. O PRESS">{renderInput('starboard.lo_press')}</DataRow>
                             <DataRow label="Exhaust">{renderInput('starboard.exhaust')}</DataRow>
@@ -124,7 +124,7 @@ export default function PreviewPage() {
                             <DataRow label="F.W COOLERS">{renderInput('starboard.fw_coolers')}</DataRow>
                             <DataRow label="L.O COOLERS">{renderInput('starboard.lo_coolers')}</DataRow>
                             
-                            <SectionTitle>GENERATOR</SectionTitle>
+                            <SectionTitle className="bg-sky-600">GENERATOR</SectionTitle>
                             <DataRow label="L.O PRESS">{renderInput('generator.lo_press')}</DataRow>
                             <DataRow label="F.W TEMP">{renderInput('generator.fw_temp')}</DataRow>
                             <DataRow label="VOLTS">{renderInput('generator.volts')}</DataRow>
@@ -133,7 +133,7 @@ export default function PreviewPage() {
 
                         {/* RIGHT COLUMN */}
                         <div className="space-y-3">
-                            <SectionTitle>DAILY TANK</SectionTitle>
+                            <SectionTitle className="bg-amber-600">DAILY TANK</SectionTitle>
                             <HeaderRow labels={['BEFORE', 'AFTER']} />
                             <div className="flex items-center gap-2">
                                 <div className="w-1/2"></div>
@@ -154,7 +154,7 @@ export default function PreviewPage() {
                             <DataRow label="">{renderInput('daily_tank.value2')}</DataRow>
                             <DataRow label="">{renderInput('daily_tank.value3')}</DataRow>
 
-                            <SectionTitle>USED</SectionTitle>
+                            <SectionTitle className="bg-purple-600">USED</SectionTitle>
                             <HeaderRow labels={['BEFORE', 'AFTER']} />
                             <div className="flex items-center gap-2">
                                 <div className="w-1/2"></div>
@@ -169,7 +169,7 @@ export default function PreviewPage() {
                             <DataRow label="">{renderInput('used.value1')}</DataRow>
                             <DataRow label="">{renderInput('used.value2')}</DataRow>
 
-                            <SectionTitle>ROB</SectionTitle>
+                            <SectionTitle className="bg-slate-500">ROB</SectionTitle>
                             <DataRow label="">{renderInput('rob.val1')}</DataRow>
                             <DataRow label="">{renderInput('rob.val2')}</DataRow>
                             <DataRow label="">{renderInput('rob.val3')}</DataRow>
@@ -185,7 +185,7 @@ export default function PreviewPage() {
                     </div>
                     
                     <div className="pt-4">
-                        <SectionTitle>Condition</SectionTitle>
+                        <SectionTitle className="bg-muted text-muted-foreground">Condition</SectionTitle>
                         <Textarea {...register('condition')} className="text-center font-bold" />
                     </div>
                 </CardContent>
@@ -201,5 +201,3 @@ export default function PreviewPage() {
     </div>
   );
 }
-
-    
