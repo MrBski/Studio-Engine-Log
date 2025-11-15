@@ -35,6 +35,7 @@ export default function PreviewPage() {
   const { toast } = useToast();
   const { addPerformaRecord } = usePerforma();
   const printRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   
   const defaultValues = {
     datetime: '',
@@ -123,15 +124,29 @@ export default function PreviewPage() {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && formRef.current) {
+      e.preventDefault();
+      const form = formRef.current;
+      const focusable = Array.from(
+        form.querySelectorAll('input, textarea')
+      ) as (HTMLInputElement | HTMLTextAreaElement)[];
+      const index = focusable.indexOf(e.currentTarget as (HTMLInputElement | HTMLTextAreaElement));
+      if (index > -1 && index < focusable.length - 1) {
+        focusable[index + 1].focus();
+      }
+    }
+  };
+
   const renderInput = (name: any) => (
     <Input {...register(name, {
         setValueAs: v => String(v).replace(',', '.') 
-    })} type="tel" inputMode="decimal" className="bg-card-foreground/5 h-8 text-right text-sm" />
+    })} type="tel" inputMode="decimal" className="bg-card-foreground/5 h-8 text-right text-sm" onKeyDown={handleKeyDown}/>
   );
 
   return (
     <div className="space-y-4 pb-8">
-       <form onSubmit={handleSubmit(onSubmit)}>
+       <form ref={formRef} onSubmit={handleSubmit(onSubmit)}>
           <div className="bg-card p-4 rounded-lg">
               <Card>
                   <CardHeader>
@@ -141,7 +156,7 @@ export default function PreviewPage() {
                       <Controller
                           name="datetime"
                           control={control}
-                          render={({ field }) => <Input {...field} type="datetime-local" className="font-bold text-center text-lg h-12" />}
+                          render={({ field }) => <Input {...field} type="datetime-local" className="font-bold text-center text-lg h-12" onKeyDown={handleKeyDown} />}
                       />
                       
                       <div className="space-y-3">
@@ -199,14 +214,14 @@ export default function PreviewPage() {
                       
                       <div className="pt-4 space-y-2">
                          <SectionTitle className="bg-muted text-muted-foreground">On Duty Engineer</SectionTitle>
-                         <Input {...register('user.date')} className="bg-card-foreground/5 h-8 text-center font-semibold" />
-                         <Input {...register('user.name')} className="bg-card-foreground/5 h-8 text-center font-semibold" />
-                         <Input {...register('user.position')} className="bg-card-foreground/5 h-8 text-center font-semibold" />
+                         <Input {...register('user.date')} className="bg-card-foreground/5 h-8 text-center font-semibold" onKeyDown={handleKeyDown}/>
+                         <Input {...register('user.name')} className="bg-card-foreground/5 h-8 text-center font-semibold" onKeyDown={handleKeyDown}/>
+                         <Input {...register('user.position')} className="bg-card-foreground/5 h-8 text-center font-semibold" onKeyDown={handleKeyDown}/>
                      </div>
                       
                       <div className="pt-4">
                           <SectionTitle className="bg-muted text-muted-foreground">Condition</SectionTitle>
-                          <Textarea {...register('condition')} className="text-center font-bold" />
+                          <Textarea {...register('condition')} className="text-center font-bold" onKeyDown={handleKeyDown}/>
                       </div>
                   </CardContent>
               </Card>
@@ -224,7 +239,7 @@ export default function PreviewPage() {
           </div>
       </form>
 
-      <div className="pt-8">
+      <div className="pt-8 fixed -right-full top-0">
         <h2 className="text-xl font-bold text-center mb-4">Live Preview</h2>
         <div ref={printRef}>
           <EngineLogViewer data={watchedValues} />
