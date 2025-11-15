@@ -162,7 +162,7 @@ export function EngineLogViewer({ data }: { data: any }) {
                            <DataCell>{((data.onduty?.before ?? 0) * 21).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell>{((data.daily.after ?? 0) * 21).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell>{dailyUsageLtrs.toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{flowmeterUsage.toFixed(1).replace('.',',')}</DataCell>
+                           <DataCell>{(data.flowmeter.before ?? 0).toFixed(1).replace('.',',')}</DataCell>
                         </DataGrid>
                     </div>
                 )}
