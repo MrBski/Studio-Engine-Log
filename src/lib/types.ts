@@ -31,7 +31,7 @@ export interface EngineLogRecord {
 
 export interface LastRecord {
     id: string;
-    type: 'Inventory' | 'Performa' | 'EngineLog' | 'Engine Log' | 'Amprahan';
+    type: 'Inventory' | 'Performa' | 'EngineLog' | 'Engine Log' | 'Restock' | 'Used';
     summary: string;
     timestamp: string;
     category?: InventoryCategory;
@@ -50,7 +50,7 @@ export type InventoryContextType = {
   updateInventoryItem: (item: InventoryItem) => void;
   deleteInventoryItem: (id: string) => void;
   setInventory: (items: InventoryItem[]) => void;
-  deductInventoryItem: (id: string, quantity: number) => void;
+  adjustStock: (id: string, quantity: number) => void;
 };
 
 export type PerformaContextType = {

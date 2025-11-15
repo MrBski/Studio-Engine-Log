@@ -3,18 +3,19 @@
 import { useInventory, usePerforma } from '@/hooks/use-app';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusCircle, Edit, Trash2, Archive, Send } from 'lucide-react';
+import { PlusCircle, MinusCircle, Edit, Trash2, Archive, PackagePlus, PackageMinus } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import type { InventoryItem, InventoryCategory, PerformaRecord } from '@/lib/types';
 import { useState, useMemo, useEffect } from 'react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
 
 const itemFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -24,10 +25,12 @@ const itemFormSchema = z.object({
   category: z.enum(['ME', 'AE', 'Others'], { required_error: "Category is required." }),
 });
 
-const amprahFormSchema = z.object({
+const stockAdjustmentSchema = z.object({
+  itemId: z.string({ required_error: "Please select an item." }),
   quantity: z.coerce.number().min(1, { message: "Quantity must be at least 1." }),
   notes: z.string().optional(),
 });
+
 
 function InventoryForm({ item, onSave, defaultCategory }: { item?: InventoryItem, onSave: (values: z.infer<typeof itemFormSchema>) => void, defaultCategory: InventoryCategory }) {
   const form = useForm<z.infer<typeof itemFormSchema>>({
@@ -101,28 +104,48 @@ function InventoryForm({ item, onSave, defaultCategory }: { item?: InventoryItem
   );
 }
 
-function AmprahForm({ item, onSave }: { item: InventoryItem, onSave: (values: z.infer<typeof amprahFormSchema>) => void }) {
-    const form = useForm<z.infer<typeof amprahFormSchema>>({
-        resolver: zodResolver(amprahFormSchema),
+function StockAdjustmentForm({ items, onSave, adjustmentType }: { items: InventoryItem[], onSave: (values: z.infer<typeof stockAdjustmentSchema>) => void, adjustmentType: 'restock' | 'used' }) {
+    const form = useForm<z.infer<typeof stockAdjustmentSchema>>({
+        resolver: zodResolver(stockAdjustmentSchema),
         defaultValues: { quantity: 1, notes: '' },
     });
+    
+    const selectedItemId = form.watch('itemId');
+    const selectedItem = useMemo(() => items.find(i => i.id === selectedItemId), [items, selectedItemId]);
 
-    const onSubmit = (values: z.infer<typeof amprahFormSchema>) => {
+    const onSubmit = (values: z.infer<typeof stockAdjustmentSchema>) => {
         onSave(values);
     };
 
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <p>Item: <span className="font-semibold">{item.name}</span></p>
-                <p>Current Stock: <span className="font-semibold">{item.quantity} {item.unit}</span></p>
                 <FormField
+                    control={form.control}
+                    name="itemId"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Inventory Item</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                    <SelectTrigger><SelectValue placeholder="Select an item" /></SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {items.map(item => <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                            {selectedItem && <FormDescription>Current stock: {selectedItem.quantity} {selectedItem.unit}</FormDescription>}
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
                     control={form.control}
                     name="quantity"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Quantity to Use (Amprah)</FormLabel>
-                            <FormControl><Input type="number" {...field} max={item.quantity} /></FormControl>
+                            <FormLabel>Quantity to {adjustmentType}</FormLabel>
+                            <FormControl><Input type="number" {...field} min={1} max={adjustmentType === 'used' ? selectedItem?.quantity : undefined} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -133,20 +156,21 @@ function AmprahForm({ item, onSave }: { item: InventoryItem, onSave: (values: z.
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Notes (Optional)</FormLabel>
-                            <FormControl><Input placeholder="e.g., For monthly maintenance" {...field} /></FormControl>
+                            <FormControl><Input placeholder={adjustmentType === 'restock' ? "e.g., Received from supplier" : "e.g., For monthly maintenance"} {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
                 <DialogFooter>
-                  <Button type="submit">Submit Amprahan</Button>
+                  <Button type="submit">Submit</Button>
                 </DialogFooter>
             </form>
         </Form>
     );
 }
 
-const InventoryList = ({ items, onEdit, onDelete, onAmprah }: { items: InventoryItem[], onEdit: (item: InventoryItem) => void, onDelete: (id: string) => void, onAmprah: (item: InventoryItem) => void }) => {
+
+const InventoryList = ({ items, onEdit, onDelete }: { items: InventoryItem[], onEdit: (item: InventoryItem) => void, onDelete: (id: string) => void }) => {
   if (items.length === 0) {
     return <p className="text-muted-foreground text-center py-8">No inventory items found in this category.</p>;
   }
@@ -166,9 +190,6 @@ const InventoryList = ({ items, onEdit, onDelete, onAmprah }: { items: Inventory
             </div>
           </CardContent>
           <CardFooter className="flex-1 flex justify-end gap-2 pt-0 sm:pt-6">
-            <Button variant="outline" size="sm" onClick={() => onAmprah(item)}>
-                <Send className="h-4 w-4 mr-2" /> Amprah
-            </Button>
             <Button variant="ghost" size="icon" onClick={() => onEdit(item)}>
                 <Edit className="h-4 w-4" />
             </Button>
@@ -199,12 +220,13 @@ const InventoryList = ({ items, onEdit, onDelete, onAmprah }: { items: Inventory
 };
 
 export default function InventoryPage() {
-  const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, deductInventoryItem } = useInventory();
+  const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, adjustStock } = useInventory();
   const { addPerformaRecord } = usePerforma();
-  const [dialogContent, setDialogContent] = useState<'newItem' | 'editItem' | 'amprah' | null>(null);
+  const [dialogContent, setDialogContent] = useState<'newItem' | 'editItem' | 'restock' | 'used' | null>(null);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<InventoryCategory>("ME");
   const [isClient, setIsClient] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
@@ -218,33 +240,52 @@ export default function InventoryPage() {
     }
     setDialogContent(null);
   };
-  
-  const handleSaveAmprah = (values: z.infer<typeof amprahFormSchema>) => {
-    if (selectedItem) {
-        deductInventoryItem(selectedItem.id, values.quantity);
-        
-        const amprahRecord: Omit<PerformaRecord, 'id'> = {
-            nama: `Amprahan: ${selectedItem.name}`,
-            tanggal: new Date().toISOString(),
-            keterangan: JSON.stringify({
-                type: 'Amprahan',
-                itemId: selectedItem.id,
-                itemName: selectedItem.name,
-                quantityUsed: values.quantity,
-                unit: selectedItem.unit,
-                notes: values.notes,
-            }),
-            jumlah: values.quantity,
-        };
-        addPerformaRecord(amprahRecord);
+
+  const handleStockAdjustment = (values: z.infer<typeof stockAdjustmentSchema>) => {
+    const item = inventory.find(i => i.id === values.itemId);
+    if (!item) return;
+
+    const adjustmentType = dialogContent as 'restock' | 'used';
+    const quantity = adjustmentType === 'restock' ? values.quantity : -values.quantity;
+    
+    if (adjustmentType === 'used' && item.quantity < values.quantity) {
+        toast({
+            variant: "destructive",
+            title: "Insufficient Stock",
+            description: `Cannot use ${values.quantity} of ${item.name} as only ${item.quantity} are available.`,
+        });
+        return;
     }
+
+    adjustStock(values.itemId, quantity);
+    
+    const recordType = adjustmentType === 'restock' ? 'Restock' : 'Used';
+    const performaRecord: Omit<PerformaRecord, 'id'> = {
+        nama: `${recordType}: ${item.name}`,
+        tanggal: new Date().toISOString(),
+        keterangan: JSON.stringify({
+            type: recordType,
+            itemId: item.id,
+            itemName: item.name,
+            quantity: values.quantity,
+            unit: item.unit,
+            notes: values.notes,
+        }),
+        jumlah: values.quantity,
+    };
+    addPerformaRecord(performaRecord);
+
+    toast({
+      title: "Inventory Updated",
+      description: `${item.name} has been adjusted.`,
+    });
     setDialogContent(null);
   };
 
 
-  const handleAddNew = () => {
+  const handleOpenDialog = (type: 'newItem' | 'restock' | 'used') => {
     setSelectedItem(undefined);
-    setDialogContent('newItem');
+    setDialogContent(type);
   };
 
   const handleEdit = (item: InventoryItem) => {
@@ -252,12 +293,6 @@ export default function InventoryPage() {
     setDialogContent('editItem');
   };
   
-  const handleAmprah = (item: InventoryItem) => {
-    setSelectedItem(item);
-    setDialogContent('amprah');
-  };
-
-
   const filteredInventory = useMemo(() => {
     return inventory.filter(item => item.category === activeTab);
   }, [inventory, activeTab]);
@@ -280,11 +315,17 @@ export default function InventoryPage() {
                 description: 'Update the details for this inventory item.',
                 content: <InventoryForm item={selectedItem} onSave={handleSaveItem} defaultCategory={activeTab} />
             };
-        case 'amprah':
+        case 'restock':
              return {
-                title: 'Amprah Item',
-                description: 'Record the usage of an inventory item.',
-                content: selectedItem ? <AmprahForm item={selectedItem} onSave={handleSaveAmprah} /> : null
+                title: 'Restock Item',
+                description: 'Add to the quantity of an existing inventory item.',
+                content: <StockAdjustmentForm items={inventory} onSave={handleStockAdjustment} adjustmentType='restock' />
+            };
+        case 'used':
+             return {
+                title: 'Use Item',
+                description: 'Deduct from the quantity of an existing inventory item.',
+                content: <StockAdjustmentForm items={inventory} onSave={handleStockAdjustment} adjustmentType='used' />
             };
         default:
             return null;
@@ -296,14 +337,22 @@ export default function InventoryPage() {
   return (
     <Dialog open={!!dialogContent} onOpenChange={(open) => !open && setDialogContent(null)}>
         <div className="space-y-8">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center flex-wrap gap-4">
             <div className="flex items-center gap-2">
-            <Archive className="h-6 w-6 text-primary" />
-            <h2 className="text-2xl font-headline font-bold text-foreground">Inventory List</h2>
+                <Archive className="h-6 w-6 text-primary" />
+                <h2 className="text-2xl font-headline font-bold text-foreground">Inventory List</h2>
             </div>
-            <Button onClick={handleAddNew}>
-                <PlusCircle className="mr-2 h-4 w-4" /> Add New
-            </Button>
+            <div className="flex gap-2">
+                <Button variant="outline" onClick={() => handleOpenDialog('used')}>
+                    <PackageMinus className="mr-2 h-4 w-4" /> Used
+                </Button>
+                 <Button variant="outline" onClick={() => handleOpenDialog('restock')}>
+                    <PackagePlus className="mr-2 h-4 w-4" /> Restock
+                </Button>
+                <Button onClick={() => handleOpenDialog('newItem')}>
+                    <PlusCircle className="mr-2 h-4 w-4" /> Add New
+                </Button>
+            </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as InventoryCategory)} className="w-full">
@@ -313,13 +362,13 @@ export default function InventoryPage() {
             <TabsTrigger value="Others">Others</TabsTrigger>
             </TabsList>
             <TabsContent value="ME">
-                <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} onAmprah={handleAmprah} />
+                <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} />
             </TabsContent>
             <TabsContent value="AE">
-                <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} onAmprah={handleAmprah} />
+                <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} />
             </TabsContent>
             <TabsContent value="Others">
-                <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} onAmprah={handleAmprah} />
+                <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} />
             </TabsContent>
         </Tabs>
         </div>

@@ -2,7 +2,7 @@
 
 import { useInventory, usePerforma, useEngineLog } from '@/hooks/use-app';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { History, Archive, Gauge, ClipboardList, FileJson, Trash2, Eye, Camera, Send } from 'lucide-react';
+import { History, Archive, Gauge, ClipboardList, FileJson, Trash2, Eye, Camera, Send, PackagePlus, PackageMinus } from 'lucide-react';
 import type { LastRecord } from '@/lib/types';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
@@ -55,9 +55,13 @@ export default function LogActivityPage() {
                     type = 'Engine Log';
                     summary = `Engine Log Entry`;
                     data = parsedKeterangan;
-                } else if (parsedKeterangan.type === 'Amprahan') {
-                    type = 'Amprahan';
-                    summary = `Used ${parsedKeterangan.quantityUsed} ${parsedKeterangan.unit} of "${parsedKeterangan.itemName}"`;
+                } else if (parsedKeterangan.type === 'Restock') {
+                    type = 'Restock';
+                    summary = `Restocked ${parsedKeterangan.quantity} ${parsedKeterangan.unit} of "${parsedKeterangan.itemName}"`;
+                    data = parsedKeterangan;
+                } else if (parsedKeterangan.type === 'Used') {
+                    type = 'Used';
+                    summary = `Used ${parsedKeterangan.quantity} ${parsedKeterangan.unit} of "${parsedKeterangan.itemName}"`;
                     data = parsedKeterangan;
                 }
             }
@@ -92,7 +96,8 @@ export default function LogActivityPage() {
         case 'Performa': return <Gauge className="h-4 w-4 text-muted-foreground" />;
         case 'EngineLog': return <ClipboardList className="h-4 w-4 text-muted-foreground" />;
         case 'Engine Log': return <FileJson className="h-4 w-4 text-muted-foreground" />;
-        case 'Amprahan': return <Send className="h-4 w-4 text-muted-foreground" />;
+        case 'Restock': return <PackagePlus className="h-4 w-4 text-muted-foreground" />;
+        case 'Used': return <PackageMinus className="h-4 w-4 text-muted-foreground" />;
         default: return null;
     }
   }
@@ -206,7 +211,7 @@ export default function LogActivityPage() {
                             </Button>
                         </DialogTrigger>
                     )}
-                    {(record.type === 'Performa' || record.type === 'Engine Log' || record.type === 'Amprahan') && (
+                    {(record.type === 'Performa' || record.type === 'Engine Log' || record.type === 'Restock' || record.type === 'Used') && (
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
                                 <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
