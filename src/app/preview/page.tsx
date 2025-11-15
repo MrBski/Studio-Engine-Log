@@ -15,6 +15,7 @@ import { Save, Camera as CameraIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { PerformaRecord } from '@/lib/types';
+import { EngineLogViewer } from '@/components/engine-log-viewer';
 
 const SectionTitle = ({ children, className }: { children: React.ReactNode; className?: string }) => (
   <h3 className={cn("font-bold text-center p-2 my-2 rounded-md text-primary-foreground text-sm", className)}>
@@ -22,7 +23,7 @@ const SectionTitle = ({ children, className }: { children: React.ReactNode; clas
   </h3>
 );
 
-const DataRow = ({ label, children, isHeader = false }: { label: string, children: React.ReactNode, isHeader?: boolean }) => (
+const DataRow = ({ label, children, isHeader = false }: { label:string, children:React.ReactNode, isHeader?: boolean }) => (
     <div className="flex items-center">
         <label className={cn("w-1/2 font-medium text-sm", isHeader ? "text-muted-foreground" : "text-foreground")}>{label}</label>
         {children}
@@ -35,21 +36,25 @@ export default function PreviewPage() {
   const { addPerformaRecord } = usePerforma();
   const printRef = useRef<HTMLDivElement>(null);
   
-  const { register, handleSubmit, setValue, control } = useForm({
-    defaultValues: {
-      datetime: '',
-      portside: { rpm: 1200.0, lo_press: 0.4, exhaust: 350400.0, radiator: 68.0, sw_temp: 31.0, fw_coolers: 6765.0, lo_coolers: 7570.0 },
-      starboard: { rpm: 1200.0, lo_press: 0.4, exhaust: 380380.0, radiator: 68.0, sw_temp: 31.0, fw_coolers: 6765.0, lo_coolers: 7571.0 },
-      generator: { lo_press: 0.36, fw_temp: 70.0, volts: 380.0, ampere: 10.0 },
-      flowmeter: { before: 29670.0, after: 29920.0 },
-      daily: { before: 64.5, after: 77.0 },
-      onduty: { before: 77.0 },
-      rob: 45914.0,
-      used4hours: 66.0,
-      user: { date: '', name: 'Mr. Basuki', position: '3/E' },
-      condition: 'Engine Room in Good condition'
-    }
+  const defaultValues = {
+    datetime: '',
+    portside: { rpm: 1200.0, lo_press: 0.4, exhaust: 350400.0, radiator: 68.0, sw_temp: 31.0, fw_coolers: 6765.0, lo_coolers: 7570.0 },
+    starboard: { rpm: 1200.0, lo_press: 0.4, exhaust: 380380.0, radiator: 68.0, sw_temp: 31.0, fw_coolers: 6765.0, lo_coolers: 7571.0 },
+    generator: { lo_press: 0.36, fw_temp: 70.0, volts: 380.0, ampere: 10.0 },
+    flowmeter: { before: 29670.0, after: 29920.0 },
+    daily: { before: 64.5, after: 77.0 },
+    onduty: { before: 77.0 },
+    rob: 45914.0,
+    used4hours: 66.0,
+    user: { date: '', name: 'Mr. Basuki', position: '3/E' },
+    condition: 'Engine Room in Good condition'
+  };
+
+  const { register, handleSubmit, setValue, control, watch } = useForm({
+    defaultValues
   });
+  
+  const watchedValues = watch();
 
   useEffect(() => {
     const now = new Date();
@@ -82,7 +87,7 @@ export default function PreviewPage() {
       });
     }
   };
-
+  
   const handleSaveToDevice = async () => {
     if (!printRef.current) {
         toast({
@@ -127,7 +132,7 @@ export default function PreviewPage() {
   return (
     <div className="space-y-4 pb-8">
        <form onSubmit={handleSubmit(onSubmit)}>
-          <div ref={printRef} className="bg-card p-4 rounded-lg">
+          <div className="bg-card p-4 rounded-lg">
               <Card>
                   <CardHeader>
                       <CardTitle className="text-center">New Engine Log Sheet</CardTitle>
@@ -218,6 +223,15 @@ export default function PreviewPage() {
               </Button>
           </div>
       </form>
+
+      <div className="pt-8">
+        <h2 className="text-xl font-bold text-center mb-4">Live Preview</h2>
+        <div ref={printRef}>
+          <EngineLogViewer data={watchedValues} />
+        </div>
+      </div>
     </div>
   );
 }
+
+    

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isValid } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -11,26 +11,36 @@ const SectionTitle = ({ children, className }: { children: React.ReactNode; clas
   </h3>
 );
 
-const DataRow = ({ label, value }: { label: string, value: any }) => (
-    <div className="flex items-center border-b border-white/5 py-1">
-        <label className="w-1/2 font-medium text-sm text-muted-foreground">{label}</label>
-        <div className="w-1/2 text-right font-mono text-sm">{String(value ?? 'N/A')}</div>
-    </div>
-);
+const DataRow = ({ label, value }: { label: string, value: any }) => {
+    const displayValue = (val: any) => {
+        if (val === null || val === undefined || val === '') return 'N/A';
+        if (typeof val === 'object' && val !== null) return JSON.stringify(val);
+        return String(val);
+    }
+    return (
+        <div className="flex items-center border-b border-white/5 py-1">
+            <label className="w-1/2 font-medium text-sm text-muted-foreground">{label}</label>
+            <div className="w-1/2 text-right font-mono text-sm">{displayValue(value)}</div>
+        </div>
+    );
+};
 
 
 export function EngineLogViewer({ data }: { data: any }) {
   if (!data) return null;
+  
+  const parsedDate = data.datetime ? parseISO(data.datetime) : null;
+  const formattedDate = parsedDate && isValid(parsedDate) ? format(parsedDate, "Pp") : 'N/A';
 
   return (
-    <div className="space-y-4 pb-8">
+    <div className="space-y-4 pb-8 bg-card p-4 rounded-lg">
         <Card>
             <CardHeader>
                 <CardTitle className="text-center">Engine Log Sheet</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-sm max-w-md mx-auto">
                 <div className="font-bold text-center text-lg h-12 flex items-center justify-center bg-muted/50 rounded-md">
-                    {data.datetime ? format(parseISO(data.datetime), "Pp") : 'N/A'}
+                    {formattedDate}
                 </div>
                 
                 <div className="space-y-3">
@@ -104,3 +114,5 @@ export function EngineLogViewer({ data }: { data: any }) {
     </div>
   );
 }
+
+    
