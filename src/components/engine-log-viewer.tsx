@@ -132,12 +132,14 @@ export function EngineLogViewer({ data }: { data: any }) {
                            <DataCell>{(data.daily.after ?? 0).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell>{((data.daily.before ?? 0) * 21).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell>{((data.daily.after ?? 0) * 21).toFixed(1).replace('.',',')}</DataCell>
+                           <DataCell className="bg-purple-800/50 h-6 rounded-sm">{(dailyUsageCm).toFixed(1).replace('.',',')} cm</DataCell>
+                           <DataCell className="bg-purple-800/50 h-6 rounded-sm">{(dailyUsageLtrs).toFixed(1).replace('.',',')} ltrs</DataCell>
                         </DataGrid>
                     </div>
                 )}
                 
                 {data.flowmeter && (
-                     <div className="space-y-1 p-1 border border-muted-foreground/50 rounded-sm">
+                    <div className="space-y-1 p-1 border border-muted-foreground/50 rounded-sm">
                         <SectionTitle className="bg-cyan-500">FLOWMETER</SectionTitle>
                         <DataGrid>
                            <DataCell>{(data.flowmeter.before ?? 0).toFixed(1).replace('.',',')}</DataCell>
