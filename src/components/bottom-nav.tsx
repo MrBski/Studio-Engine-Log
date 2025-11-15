@@ -7,8 +7,8 @@ import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
 const navItems = [
-  { href: '/last-record', icon: History, label: 'Activity' },
-  { href: '/preview', icon: Camera, label: 'Input Log' },
+  { href: '/preview', icon: Camera, label: 'Input Data' },
+  { href: '/last-record', icon: History, label: 'Log Activity' },
   { href: '/', icon: Home, label: 'Home' },
   { href: '/inventory', icon: Archive, label: 'Inventory' },
   { href: '/settings', icon: Settings, label: 'Settings' },
