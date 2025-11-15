@@ -2,13 +2,17 @@
 
 import { useInventory, usePerforma, useEngineLog } from '@/hooks/use-app';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { History, Archive, Gauge, ClipboardList, FileJson, Trash2, Eye } from 'lucide-react';
+import { History, Archive, Gauge, ClipboardList, FileJson, Trash2, Eye, Camera } from 'lucide-react';
 import type { LastRecord } from '@/lib/types';
-import { useMemo, useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
+import { useMemo, useState, useEffect, useRef } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { EngineLogViewer } from '@/components/engine-log-viewer';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
+import html2canvas from 'html2canvas';
+import { saveAs } from 'file-saver';
+import { format } from 'date-fns';
 
 
 export default function LogActivityPage() {
@@ -17,6 +21,8 @@ export default function LogActivityPage() {
   const { engineLogs } = useEngineLog();
   const [isClient, setIsClient] = useState(false);
   const [selectedLog, setSelectedLog] = useState<any | null>(null);
+  const printRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
@@ -89,6 +95,41 @@ export default function LogActivityPage() {
         setSelectedLog(record.data);
     }
   }
+
+  const handleSaveToDevice = async () => {
+    if (!printRef.current) {
+        toast({
+            variant: "destructive",
+            title: 'Error',
+            description: 'Could not capture the log sheet.',
+        });
+        return;
+    }
+    toast({
+        title: 'Generating Image...',
+        description: 'Please wait while the log sheet is being captured.',
+    });
+    try {
+        const canvas = await html2canvas(printRef.current, { useCORS: true, scale: 2 });
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        if (blob) {
+            const now = new Date();
+            const fileName = `EngineLog_${format(now, 'yyyy-MM-dd_HH-mm-ss')}.png`;
+            saveAs(blob, fileName);
+            toast({
+                title: 'Image Saved!',
+                description: 'The log sheet has been saved to your device.',
+            });
+        }
+    } catch (error) {
+        console.error("Failed to save image:", error);
+        toast({
+            variant: "destructive",
+            title: 'Error Saving Image',
+            description: 'Could not generate the image. Please try again.',
+        });
+    }
+  };
   
   if (!isClient) {
     return (
@@ -172,9 +213,15 @@ export default function LogActivityPage() {
             <DialogHeader>
             <DialogTitle>Engine Log Preview</DialogTitle>
             </DialogHeader>
-            <div className="max-h-[80vh] overflow-y-auto">
+            <div className="max-h-[80vh] overflow-y-auto" ref={printRef}>
                 {selectedLog && <EngineLogViewer data={selectedLog} />}
             </div>
+             <DialogFooter>
+                <Button type="button" size="lg" variant="outline" onClick={handleSaveToDevice}>
+                    <Camera className="mr-2 h-4 w-4" />
+                    Save to Device
+                </Button>
+            </DialogFooter>
         </DialogContent>
         </div>
     </Dialog>
