@@ -8,6 +8,7 @@ import { Trash2, Gauge, Ban, FileJson } from 'lucide-react';
 import Link from 'next/link';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { EngineLogViewer } from '@/components/engine-log-viewer';
+import { useEffect, useState } from 'react';
 
 const JsonViewer = ({ jsonData }: { jsonData: string }) => {
   let data;
@@ -38,6 +39,11 @@ const JsonViewer = ({ jsonData }: { jsonData: string }) => {
 
 export default function PerformaPage() {
   const { performaRecords, deletePerformaRecord, deleteAllPerformaRecords } = usePerforma();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   
   // Sort records by date, most recent first
   const sortedData = [...performaRecords].sort((a, b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime());
@@ -50,6 +56,10 @@ export default function PerformaPage() {
       return false;
     }
     return true;
+  }
+
+  if (!isClient) {
+    return null; // or a loading skeleton
   }
 
   return (

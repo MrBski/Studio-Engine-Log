@@ -13,7 +13,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import type { InventoryItem, InventoryCategory } from '@/lib/types';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 const formSchema = z.object({
@@ -169,6 +169,11 @@ export default function InventoryPage() {
   const [openDialog, setOpenDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<InventoryItem | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<InventoryCategory>("ME");
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSave = (values: z.infer<typeof formSchema>) => {
     if (editingItem) {
@@ -193,6 +198,10 @@ export default function InventoryPage() {
   const filteredInventory = useMemo(() => {
     return inventory.filter(item => item.category === activeTab);
   }, [inventory, activeTab]);
+
+  if (!isClient) {
+    return null; // or a loading skeleton
+  }
 
   return (
     <div className="space-y-8">
