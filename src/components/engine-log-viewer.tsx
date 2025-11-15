@@ -191,14 +191,20 @@ export function EngineLogViewer({ data }: { data: any }) {
                 
                 {data.rob4hours && (
                     <div className="space-y-1 p-1 border border-muted-foreground/50 rounded-sm">
-                        <SectionTitle className="bg-gray-500">ROB for 4 Hours</SectionTitle>
-                         <DataGrid>
-                            <DataCell>{(data.rob ?? 0).toFixed(1).replace('.',',')}</DataCell>
-                            <DataCell>{(data.rob4hours.hour1).toFixed(1).replace('.',',')}</DataCell>
-                            <DataCell>{(data.rob4hours.hour2).toFixed(1).replace('.',',')}</DataCell>
-                            <DataCell>{(data.rob4hours.hour3).toFixed(1).replace('.',',')}</DataCell>
-                            <DataCell span={2}>{(data.rob4hours.hour4).toFixed(1).replace('.',',')}</DataCell>
-                        </DataGrid>
+                        <SectionTitle className="bg-gray-700">USED</SectionTitle>
+                        <div className="grid grid-cols-2">
+                            <div className="bg-green-500 text-black font-bold text-lg flex items-center justify-center rounded-l-sm">
+                                <div className="text-center">
+                                    <p className="border-b border-black">{(data.rob ?? 0).toFixed(0)}</p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col text-right">
+                                <DataCell className="bg-rose-100/10 h-6 border-b border-muted-foreground/20">{(data.rob4hours.hour1).toFixed(0)}</DataCell>
+                                <DataCell className="bg-rose-100/10 h-6 border-b border-muted-foreground/20">{(data.rob4hours.hour2).toFixed(0)}</DataCell>
+                                <DataCell className="bg-rose-100/10 h-6 border-b border-muted-foreground/20">{(data.rob4hours.hour3).toFixed(0)}</DataCell>
+                                <DataCell className="bg-rose-100/10 h-6">{(data.rob4hours.hour4).toFixed(0)}</DataCell>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
