@@ -18,10 +18,10 @@ const DataRow = ({ label, value, className, valueClassName }: { label: string, v
     const displayValue = (val: any) => {
         if (val === null || val === undefined || val === '' || (typeof val === 'number' && isNaN(val))) return 'N/A';
         if (typeof val === 'number') {
-           if (val % 1 === 0) { // It's an integer
+           if (Number.isInteger(val)) {
                 return String(val);
            }
-           return val.toFixed(1).replace('.', ','); // It's a float
+           return val.toFixed(1).replace('.', ',');
         }
         return String(val);
     }
@@ -64,7 +64,7 @@ export function EngineLogViewer({ data }: { data: any }) {
   const dailyUsageLtrs = dailyUsageCm * dailyTankMultiplier;
   const usageDifference = dailyUsageLtrs - flowmeterUsage;
   
-  const used4hoursCm = data.used4hours ?? 0;
+  const used4hoursCm = (data.onduty?.before ?? 0) - (data.daily?.before ?? 0);
   const hourlyUsageLtrs = (used4hoursCm / 4) * dailyTankMultiplier;
   const roundedHourlyUsage = Math.round(hourlyUsageLtrs);
   
@@ -77,7 +77,7 @@ export function EngineLogViewer({ data }: { data: any }) {
 
   const formatNumber = (num: number) => {
       if (num === null || num === undefined || isNaN(num)) return 'N/A';
-      if (num % 1 === 0) return String(num);
+      if (Number.isInteger(num)) return String(num);
       return num.toFixed(1).replace('.', ',');
   }
 
@@ -191,7 +191,7 @@ export function EngineLogViewer({ data }: { data: any }) {
                             </DataGrid>
                             <SectionTitle className="bg-blue-800 mt-2">Pembulatan</SectionTitle>
                              <DataGrid className="border-none">
-                                <DataCell span={2} className="bg-blue-800/50 h-6 rounded-sm">{roundedHourlyUsage.toFixed(2).replace('.',',')} ltrs/jam</DataCell>
+                                <DataCell span={2} className="bg-blue-800/50 h-6 rounded-sm">{formatNumber(roundedHourlyUsage)} ltrs/jam</DataCell>
                             </DataGrid>
                         </div>
                     </div>
@@ -234,3 +234,5 @@ export function EngineLogViewer({ data }: { data: any }) {
     </div>
   );
 }
+
+    
