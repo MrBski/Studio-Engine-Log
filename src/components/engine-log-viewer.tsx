@@ -14,7 +14,8 @@ const SectionTitle = ({ children, className }: { children: React.ReactNode; clas
 const DataRow = ({ label, value }: { label: string, value: any }) => {
     const displayValue = (val: any) => {
         if (val === null || val === undefined || val === '') return 'N/A';
-        if (typeof val === 'object' && val !== null) return JSON.stringify(val);
+        // Check for object that is not null and not an array
+        if (typeof val === 'object' && val !== null && !Array.isArray(val)) return JSON.stringify(val);
         return String(val);
     }
     return (
@@ -29,7 +30,7 @@ const DataRow = ({ label, value }: { label: string, value: any }) => {
 export function EngineLogViewer({ data }: { data: any }) {
   if (!data) return null;
   
-  const parsedDate = data.datetime ? parseISO(data.datetime) : null;
+  const parsedDate = data.datetime ? (typeof data.datetime === 'string' ? parseISO(data.datetime) : new Date(data.datetime)) : null;
   const formattedDate = parsedDate && isValid(parsedDate) ? format(parsedDate, "Pp") : 'N/A';
 
   return (
@@ -43,52 +44,64 @@ export function EngineLogViewer({ data }: { data: any }) {
                     {formattedDate}
                 </div>
                 
+                {data.portside && (
                 <div className="space-y-3">
                     <SectionTitle className="bg-red-600">M.E Port Side</SectionTitle>
-                    <DataRow label="RPM" value={data.portside?.rpm} />
-                    <DataRow label="L.O. PRESS" value={data.portside?.lo_press} />
-                    <DataRow label="Exhaust" value={data.portside?.exhaust} />
-                    <DataRow label="Radiator" value={data.portside?.radiator} />
-                    <DataRow label="SW Temp" value={data.portside?.sw_temp} />
-                    <DataRow label="F.W. COOLERS" value={data.portside?.fw_coolers} />
-                    <DataRow label="L.O. COOLERS" value={data.portside?.lo_coolers} />
+                    <DataRow label="RPM" value={data.portside.rpm} />
+                    <DataRow label="L.O. PRESS" value={data.portside.lo_press} />
+                    <DataRow label="Exhaust" value={data.portside.exhaust} />
+                    <DataRow label="Radiator" value={data.portside.radiator} />
+                    <DataRow label="SW Temp" value={data.portside.sw_temp} />
+                    <DataRow label="F.W. COOLERS" value={data.portside.fw_coolers} />
+                    <DataRow label="L.O. COOLERS" value={data.portside.lo_coolers} />
                 </div>
+                )}
 
+                {data.starboard && (
                 <div className="space-y-3">
                     <SectionTitle className="bg-green-600">M.E Starboard</SectionTitle>
-                    <DataRow label="RPM" value={data.starboard?.rpm} />
-                    <DataRow label="L.O. PRESS" value={data.starboard?.lo_press} />
-                    <DataRow label="Exhaust" value={data.starboard?.exhaust} />
-                    <DataRow label="Radiator" value={data.starboard?.radiator} />
-                    <DataRow label="SW Temp" value={data.starboard?.sw_temp} />
-                    <DataRow label="F.W. COOLERS" value={data.starboard?.fw_coolers} />
-                    <DataRow label="L.O. COOLERS" value={data.starboard?.lo_coolers} />
+                    <DataRow label="RPM" value={data.starboard.rpm} />
+                    <DataRow label="L.O. PRESS" value={data.starboard.lo_press} />
+                    <DataRow label="Exhaust" value={data.starboard.exhaust} />
+                    <DataRow label="Radiator" value={data.starboard.radiator} />
+                    <DataRow label="SW Temp" value={data.starboard.sw_temp} />
+                    <DataRow label="F.W. COOLERS" value={data.starboard.fw_coolers} />
+                    <DataRow label="L.O. COOLERS" value={data.starboard.lo_coolers} />
                 </div>
+                )}
                 
+                {data.generator && (
                 <div className="space-y-3">
                     <SectionTitle className="bg-sky-600">Generator</SectionTitle>
-                    <DataRow label="L.O. PRESS" value={data.generator?.lo_press} />
-                    <DataRow label="F.W. TEMP" value={data.generator?.fw_temp} />
-                    <DataRow label="VOLTS" value={data.generator?.volts} />
-                    <DataRow label="AMPERE" value={data.generator?.ampere} />
+                    <DataRow label="L.O. PRESS" value={data.generator.lo_press} />
+                    <DataRow label="F.W. TEMP" value={data.generator.fw_temp} />
+                    <DataRow label="VOLTS" value={data.generator.volts} />
+                    <DataRow label="AMPERE" value={data.generator.ampere} />
                 </div>
+                )}
                 
+                {data.flowmeter && (
                 <div className="space-y-3">
                     <SectionTitle className="bg-amber-600">Flowmeter</SectionTitle>
-                    <DataRow label="Before" value={data.flowmeter?.before} />
-                    <DataRow label="After" value={data.flowmeter?.after} />
+                    <DataRow label="Before" value={data.flowmeter.before} />
+                    <DataRow label="After" value={data.flowmeter.after} />
                 </div>
+                )}
                 
+                {data.daily && (
                 <div className="space-y-3">
                     <SectionTitle className="bg-purple-600">Daily</SectionTitle>
-                    <DataRow label="Before" value={data.daily?.before} />
-                    <DataRow label="After" value={data.daily?.after} />
+                    <DataRow label="Before" value={data.daily.before} />
+                    <DataRow label="After" value={data.daily.after} />
                 </div>
+                )}
                 
+                {data.onduty && (
                 <div className="space-y-3">
                     <SectionTitle className="bg-cyan-600">On Duty</SectionTitle>
-                    <DataRow label="Before" value={data.onduty?.before} />
+                    <DataRow label="Before" value={data.onduty.before} />
                 </div>
+                )}
                 
                 <div className="space-y-3">
                     <SectionTitle className="bg-slate-500">Other</SectionTitle>
@@ -96,23 +109,25 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <DataRow label="USED 4 Hours" value={data.used4hours} />
                 </div>
                 
+                {data.user && (
                 <div className="pt-4 space-y-2">
                     <SectionTitle className="bg-muted text-muted-foreground">On Duty Engineer</SectionTitle>
-                    <div className="bg-card-foreground/5 h-8 text-center font-semibold flex items-center justify-center rounded-md">{data.user?.date}</div>
-                    <div className="bg-card-foreground/5 h-8 text-center font-semibold flex items-center justify-center rounded-md">{data.user?.name}</div>
-                    <div className="bg-card-foreground/5 h-8 text-center font-semibold flex items-center justify-center rounded-md">{data.user?.position}</div>
+                    <div className="bg-card-foreground/5 h-8 text-center font-semibold flex items-center justify-center rounded-md">{data.user.date}</div>
+                    <div className="bg-card-foreground/5 h-8 text-center font-semibold flex items-center justify-center rounded-md">{data.user.name}</div>
+                    <div className="bg-card-foreground/5 h-8 text-center font-semibold flex items-center justify-center rounded-md">{data.user.position}</div>
                 </div>
+                )}
 
+                {data.condition && (
                 <div className="pt-4">
                     <SectionTitle className="bg-muted text-muted-foreground">Condition</SectionTitle>
                     <div className="text-center font-bold p-4 rounded-md bg-muted/50 min-h-[60px] flex items-center justify-center">
                         {data.condition}
                     </div>
                 </div>
+                )}
             </CardContent>
         </Card>
     </div>
   );
 }
-
-    
