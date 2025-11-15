@@ -1,6 +1,6 @@
 'use client';
 
-import { useInventory } from '@/hooks/use-app';
+import { useInventory, usePerforma } from '@/hooks/use-app';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
@@ -8,15 +8,15 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusCircle, Edit, Trash2, Archive } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Archive, Send } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import type { InventoryItem, InventoryCategory } from '@/lib/types';
+import type { InventoryItem, InventoryCategory, PerformaRecord } from '@/lib/types';
 import { useState, useMemo, useEffect } from 'react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
-const formSchema = z.object({
+const itemFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   quantity: z.coerce.number().min(0, { message: "Quantity can't be negative." }),
   unit: z.string().min(1, { message: "Unit is required." }),
@@ -24,9 +24,14 @@ const formSchema = z.object({
   category: z.enum(['ME', 'AE', 'Others'], { required_error: "Category is required." }),
 });
 
-function InventoryForm({ item, onSave, defaultCategory }: { item?: InventoryItem, onSave: (values: z.infer<typeof formSchema>) => void, defaultCategory: InventoryCategory }) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+const amprahFormSchema = z.object({
+  quantity: z.coerce.number().min(1, { message: "Quantity must be at least 1." }),
+  notes: z.string().optional(),
+});
+
+function InventoryForm({ item, onSave, defaultCategory }: { item?: InventoryItem, onSave: (values: z.infer<typeof itemFormSchema>) => void, defaultCategory: InventoryCategory }) {
+  const form = useForm<z.infer<typeof itemFormSchema>>({
+    resolver: zodResolver(itemFormSchema),
     defaultValues: item || { name: '', quantity: 0, unit: '', location: '', category: defaultCategory },
   });
 
@@ -34,24 +39,15 @@ function InventoryForm({ item, onSave, defaultCategory }: { item?: InventoryItem
     form.reset(item || { name: '', quantity: 0, unit: '', location: '', category: defaultCategory });
   }, [item, form, defaultCategory]);
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    onSave(values);
-  };
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
+      <form onSubmit={form.handleSubmit(onSave)} className="space-y-4">
+        <FormField control={form.control} name="category" render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="ME">Spare Part ME</SelectItem>
@@ -63,10 +59,7 @@ function InventoryForm({ item, onSave, defaultCategory }: { item?: InventoryItem
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
+        <FormField control={form.control} name="name" render={({ field }) => (
             <FormItem>
               <FormLabel>Item Name</FormLabel>
               <FormControl><Input placeholder="e.g., Spare Piston" {...field} /></FormControl>
@@ -75,10 +68,7 @@ function InventoryForm({ item, onSave, defaultCategory }: { item?: InventoryItem
           )}
         />
         <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="quantity"
-            render={({ field }) => (
+          <FormField control={form.control} name="quantity" render={({ field }) => (
               <FormItem>
                 <FormLabel>Quantity</FormLabel>
                 <FormControl><Input type="number" {...field} /></FormControl>
@@ -86,10 +76,7 @@ function InventoryForm({ item, onSave, defaultCategory }: { item?: InventoryItem
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="unit"
-            render={({ field }) => (
+          <FormField control={form.control} name="unit" render={({ field }) => (
               <FormItem>
                 <FormLabel>Unit</FormLabel>
                 <FormControl><Input placeholder="e.g., pieces" {...field} /></FormControl>
@@ -98,10 +85,7 @@ function InventoryForm({ item, onSave, defaultCategory }: { item?: InventoryItem
             )}
           />
         </div>
-        <FormField
-          control={form.control}
-          name="location"
-          render={({ field }) => (
+        <FormField control={form.control} name="location" render={({ field }) => (
             <FormItem>
               <FormLabel>Location</FormLabel>
               <FormControl><Input placeholder="e.g., Engine Store" {...field} /></FormControl>
@@ -110,16 +94,59 @@ function InventoryForm({ item, onSave, defaultCategory }: { item?: InventoryItem
           )}
         />
         <DialogFooter>
-          <DialogClose asChild>
             <Button type="submit">Save</Button>
-          </DialogClose>
         </DialogFooter>
       </form>
     </Form>
   );
 }
 
-const InventoryList = ({ items, onEdit, onDelete }: { items: InventoryItem[], onEdit: (item: InventoryItem) => void, onDelete: (id: string) => void }) => {
+function AmprahForm({ item, onSave }: { item: InventoryItem, onSave: (values: z.infer<typeof amprahFormSchema>) => void }) {
+    const form = useForm<z.infer<typeof amprahFormSchema>>({
+        resolver: zodResolver(amprahFormSchema),
+        defaultValues: { quantity: 1, notes: '' },
+    });
+
+    const onSubmit = (values: z.infer<typeof amprahFormSchema>) => {
+        onSave(values);
+    };
+
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <p>Item: <span className="font-semibold">{item.name}</span></p>
+                <p>Current Stock: <span className="font-semibold">{item.quantity} {item.unit}</span></p>
+                <FormField
+                    control={form.control}
+                    name="quantity"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Quantity to Use (Amprah)</FormLabel>
+                            <FormControl><Input type="number" {...field} max={item.quantity} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="notes"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Notes (Optional)</FormLabel>
+                            <FormControl><Input placeholder="e.g., For monthly maintenance" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <DialogFooter>
+                  <Button type="submit">Submit Amprahan</Button>
+                </DialogFooter>
+            </form>
+        </Form>
+    );
+}
+
+const InventoryList = ({ items, onEdit, onDelete, onAmprah }: { items: InventoryItem[], onEdit: (item: InventoryItem) => void, onDelete: (id: string) => void, onAmprah: (item: InventoryItem) => void }) => {
   if (items.length === 0) {
     return <p className="text-muted-foreground text-center py-8">No inventory items found in this category.</p>;
   }
@@ -139,12 +166,13 @@ const InventoryList = ({ items, onEdit, onDelete }: { items: InventoryItem[], on
             </div>
           </CardContent>
           <CardFooter className="flex-1 flex justify-end gap-2 pt-0 sm:pt-6">
-             <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={() => onEdit(item)}>
+            <Button variant="outline" size="sm" onClick={() => onAmprah(item)}>
+                <Send className="h-4 w-4 mr-2" /> Amprah
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => onEdit(item)}>
                 <Edit className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-             <AlertDialog>
+            </Button>
+            <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
                   <Trash2 className="h-4 w-4" />
@@ -171,9 +199,10 @@ const InventoryList = ({ items, onEdit, onDelete }: { items: InventoryItem[], on
 };
 
 export default function InventoryPage() {
-  const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem } = useInventory();
-  const [openDialog, setOpenDialog] = useState(false);
-  const [editingItem, setEditingItem] = useState<InventoryItem | undefined>(undefined);
+  const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, deductInventoryItem } = useInventory();
+  const { addPerformaRecord } = usePerforma();
+  const [dialogContent, setDialogContent] = useState<'newItem' | 'editItem' | 'amprah' | null>(null);
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<InventoryCategory>("ME");
   const [isClient, setIsClient] = useState(false);
 
@@ -181,25 +210,53 @@ export default function InventoryPage() {
     setIsClient(true);
   }, []);
 
-  const handleSave = (values: z.infer<typeof formSchema>) => {
-    if (editingItem) {
-      updateInventoryItem({ ...editingItem, ...values });
+  const handleSaveItem = (values: z.infer<typeof itemFormSchema>) => {
+    if (dialogContent === 'editItem' && selectedItem) {
+      updateInventoryItem({ ...selectedItem, ...values });
     } else {
       addInventoryItem(values);
     }
-    setOpenDialog(false);
-    setEditingItem(undefined);
+    setDialogContent(null);
+  };
+  
+  const handleSaveAmprah = (values: z.infer<typeof amprahFormSchema>) => {
+    if (selectedItem) {
+        deductInventoryItem(selectedItem.id, values.quantity);
+        
+        const amprahRecord: Omit<PerformaRecord, 'id'> = {
+            nama: `Amprahan: ${selectedItem.name}`,
+            tanggal: new Date().toISOString(),
+            keterangan: JSON.stringify({
+                type: 'Amprahan',
+                itemId: selectedItem.id,
+                itemName: selectedItem.name,
+                quantityUsed: values.quantity,
+                unit: selectedItem.unit,
+                notes: values.notes,
+            }),
+            jumlah: values.quantity,
+        };
+        addPerformaRecord(amprahRecord);
+    }
+    setDialogContent(null);
   };
 
+
   const handleAddNew = () => {
-    setEditingItem(undefined);
-    setOpenDialog(true);
+    setSelectedItem(undefined);
+    setDialogContent('newItem');
   };
 
   const handleEdit = (item: InventoryItem) => {
-    setEditingItem(item);
-    setOpenDialog(true);
+    setSelectedItem(item);
+    setDialogContent('editItem');
   };
+  
+  const handleAmprah = (item: InventoryItem) => {
+    setSelectedItem(item);
+    setDialogContent('amprah');
+  };
+
 
   const filteredInventory = useMemo(() => {
     return inventory.filter(item => item.category === activeTab);
@@ -209,19 +266,44 @@ export default function InventoryPage() {
     return null; // or a loading skeleton
   }
 
+  const getDialogContent = () => {
+    switch (dialogContent) {
+        case 'newItem':
+            return {
+                title: 'Add New Item',
+                description: 'Fill in the details for the new inventory item.',
+                content: <InventoryForm onSave={handleSaveItem} defaultCategory={activeTab} />
+            };
+        case 'editItem':
+            return {
+                title: 'Edit Item',
+                description: 'Update the details for this inventory item.',
+                content: <InventoryForm item={selectedItem} onSave={handleSaveItem} defaultCategory={activeTab} />
+            };
+        case 'amprah':
+             return {
+                title: 'Amprah Item',
+                description: 'Record the usage of an inventory item.',
+                content: selectedItem ? <AmprahForm item={selectedItem} onSave={handleSaveAmprah} /> : null
+            };
+        default:
+            return null;
+    }
+  }
+  
+  const currentDialog = getDialogContent();
+
   return (
-    <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+    <Dialog open={!!dialogContent} onOpenChange={(open) => !open && setDialogContent(null)}>
         <div className="space-y-8">
         <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
             <Archive className="h-6 w-6 text-primary" />
             <h2 className="text-2xl font-headline font-bold text-foreground">Inventory List</h2>
             </div>
-            <DialogTrigger asChild>
-                <Button onClick={handleAddNew}>
+            <Button onClick={handleAddNew}>
                 <PlusCircle className="mr-2 h-4 w-4" /> Add New
-                </Button>
-            </DialogTrigger>
+            </Button>
         </div>
 
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as InventoryCategory)} className="w-full">
@@ -231,26 +313,26 @@ export default function InventoryPage() {
             <TabsTrigger value="Others">Others</TabsTrigger>
             </TabsList>
             <TabsContent value="ME">
-            <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} />
+                <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} onAmprah={handleAmprah} />
             </TabsContent>
             <TabsContent value="AE">
-            <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} />
+                <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} onAmprah={handleAmprah} />
             </TabsContent>
             <TabsContent value="Others">
-            <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} />
+                <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} onAmprah={handleAmprah} />
             </TabsContent>
         </Tabs>
         </div>
 
-        <DialogContent>
-            <DialogHeader>
-            <DialogTitle>{editingItem ? 'Edit Item' : 'Add New Item'}</DialogTitle>
-            <DialogDescription>
-                {editingItem ? 'Update the details for this inventory item.' : 'Fill in the details for the new inventory item.'}
-            </DialogDescription>
-            </DialogHeader>
-            <InventoryForm item={editingItem} onSave={handleSave} defaultCategory={activeTab} />
-        </DialogContent>
+        {currentDialog && (
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{currentDialog.title}</DialogTitle>
+                    <DialogDescription>{currentDialog.description}</DialogDescription>
+                </DialogHeader>
+                {currentDialog.content}
+            </DialogContent>
+        )}
     </Dialog>
   );
 }

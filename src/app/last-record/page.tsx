@@ -2,7 +2,7 @@
 
 import { useInventory, usePerforma, useEngineLog } from '@/hooks/use-app';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { History, Archive, Gauge, ClipboardList, FileJson, Trash2, Eye, Camera } from 'lucide-react';
+import { History, Archive, Gauge, ClipboardList, FileJson, Trash2, Eye, Camera, Send } from 'lucide-react';
 import type { LastRecord } from '@/lib/types';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
@@ -50,10 +50,16 @@ export default function LogActivityPage() {
         
         try {
             const parsedKeterangan = JSON.parse(lastPerf.keterangan);
-            if (parsedKeterangan && typeof parsedKeterangan === 'object' && 'datetime' in parsedKeterangan) {
-              type = 'Engine Log';
-              summary = `Engine Log Entry`;
-              data = parsedKeterangan;
+            if (parsedKeterangan && typeof parsedKeterangan === 'object') {
+                if ('datetime' in parsedKeterangan) {
+                    type = 'Engine Log';
+                    summary = `Engine Log Entry`;
+                    data = parsedKeterangan;
+                } else if (parsedKeterangan.type === 'Amprahan') {
+                    type = 'Amprahan';
+                    summary = `Used ${parsedKeterangan.quantityUsed} ${parsedKeterangan.unit} of "${parsedKeterangan.itemName}"`;
+                    data = parsedKeterangan;
+                }
             }
         } catch (e) {
             // Not a JSON string, treat as normal performa record
@@ -86,6 +92,7 @@ export default function LogActivityPage() {
         case 'Performa': return <Gauge className="h-4 w-4 text-muted-foreground" />;
         case 'EngineLog': return <ClipboardList className="h-4 w-4 text-muted-foreground" />;
         case 'Engine Log': return <FileJson className="h-4 w-4 text-muted-foreground" />;
+        case 'Amprahan': return <Send className="h-4 w-4 text-muted-foreground" />;
         default: return null;
     }
   }
@@ -199,7 +206,7 @@ export default function LogActivityPage() {
                             </Button>
                         </DialogTrigger>
                     )}
-                    {(record.type === 'Performa' || record.type === 'Engine Log') && (
+                    {(record.type === 'Performa' || record.type === 'Engine Log' || record.type === 'Amprahan') && (
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
                                 <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
@@ -210,7 +217,7 @@ export default function LogActivityPage() {
                                 <AlertDialogHeader>
                                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    This will permanently delete the record.
+                                    This will permanently delete the record. This action cannot be undone.
                                 </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>

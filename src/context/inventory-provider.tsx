@@ -23,12 +23,21 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     setInventory(prev => prev.filter(item => item.id !== id));
   }, [setInventory]);
 
+  const deductInventoryItem = useCallback((id: string, quantityToDeduct: number) => {
+    setInventory(prev => prev.map(item =>
+        item.id === id
+            ? { ...item, quantity: Math.max(0, item.quantity - quantityToDeduct), timestamp: new Date().toISOString() }
+            : item
+    ));
+  }, [setInventory]);
+
   const value = {
     inventory,
     addInventoryItem,
     updateInventoryItem,
     deleteInventoryItem,
-    setInventory
+    setInventory,
+    deductInventoryItem
   };
 
   return <InventoryContext.Provider value={value}>{children}</InventoryContext.Provider>;
