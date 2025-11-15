@@ -34,6 +34,8 @@ export interface LastRecord {
     type: 'Inventory' | 'Performa' | 'EngineLog' | 'Engine Log';
     summary: string;
     timestamp: string;
+    category?: InventoryCategory;
+    data?: any;
 }
 
 // Context types
@@ -62,5 +64,3 @@ export type EngineLogContextType = {
   engineLogs: EngineLogRecord[];
   addEngineLog: (sections: EngineLogSection[]) => void;
 };
-
-    

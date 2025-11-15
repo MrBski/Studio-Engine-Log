@@ -8,7 +8,7 @@ export default function HomePage() {
       <h1 className="text-3xl font-headline font-bold text-center text-foreground">Engine Log</h1>
       <div className="w-full max-w-md space-y-4 pt-4">
         <Button asChild size="lg" className="w-full h-20 text-xl font-headline shadow-lg transition-transform hover:scale-105" variant="outline">
-          <Link href="/performa">
+          <Link href="/last-record">
             <History className="mr-4 h-8 w-8 text-primary" />
             LAST RCD
           </Link>
