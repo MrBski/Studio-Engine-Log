@@ -5,7 +5,6 @@ import { ShipProvider } from './ship-provider';
 import { InventoryProvider } from './inventory-provider';
 import { PerformaProvider } from './performa-provider';
 import { EngineLogProvider } from './engine-log-provider';
-import { AnalysisProvider } from './analysis-provider';
 
 export function AppProvider({ children }: { children: ReactNode }) {
   return (
@@ -13,9 +12,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       <InventoryProvider>
         <PerformaProvider>
           <EngineLogProvider>
-            <AnalysisProvider>
-                {children}
-            </AnalysisProvider>
+            {children}
           </EngineLogProvider>
         </PerformaProvider>
       </InventoryProvider>
