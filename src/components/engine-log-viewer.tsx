@@ -58,8 +58,7 @@ export function EngineLogViewer({ data }: { data: any }) {
   const dailyUsageLtrs = dailyUsageCm * 21;
   const usageDifference = dailyUsageLtrs - flowmeterUsage;
   const used4hoursCm = (data.onduty?.before ?? 0) - (data.daily?.before ?? 0);
-  const hourlyUsageCm = used4hoursCm / 4;
-  const hourlyUsageLtrs = hourlyUsageCm * 21;
+  const hourlyUsageLtrs = (used4hoursCm / 4) * 21;
   const roundedHourlyUsage = Math.round(hourlyUsageLtrs);
   
   const rob = data.rob ?? 0;
@@ -145,8 +144,8 @@ export function EngineLogViewer({ data }: { data: any }) {
                            <DataCell>{(data.daily.after ?? 0).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell>{((data.daily.before ?? 0) * 21).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell>{((data.daily.after ?? 0) * 21).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell className="bg-purple-800/50 h-6 rounded-sm">{(dailyUsageCm).toFixed(1).replace('.',',')} cm</DataCell>
-                           <DataCell className="bg-purple-800/50 h-6 rounded-sm">{(dailyUsageLtrs).toFixed(1).replace('.',',')} ltrs</DataCell>
+                           <DataCell span={2} className="bg-purple-800/50 h-6 rounded-sm">{(dailyUsageCm).toFixed(1).replace('.',',')} cm</DataCell>
+                           <DataCell span={2} className="bg-purple-800/50 h-6 rounded-sm mt-1">{(dailyUsageLtrs).toFixed(1).replace('.',',')} ltrs</DataCell>
                         </DataGrid>
                     </div>
                 )}
@@ -174,6 +173,10 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <div className="space-y-1 p-1 border border-muted-foreground/50 rounded-sm">
                         <div className="space-y-1 p-1">
                             <SectionTitle className="bg-blue-800">Pemakaian Per Jam</SectionTitle>
+                             <DataGrid className="border-none">
+                                <DataCell span={2} className="bg-blue-800/50 h-6 rounded-sm">{(hourlyUsageLtrs).toFixed(2).replace('.',',')} ltrs/jam</DataCell>
+                            </DataGrid>
+                            <SectionTitle className="bg-blue-800 mt-2">Pembulatan</SectionTitle>
                              <DataGrid className="border-none">
                                 <DataCell span={2} className="bg-blue-800/50 h-6 rounded-sm">{(roundedHourlyUsage).toFixed(2).replace('.',',')} ltrs/jam</DataCell>
                             </DataGrid>
