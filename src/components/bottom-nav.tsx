@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Camera, Archive, Settings, Bot, History } from 'lucide-react';
+import { Home, Camera, Archive, Settings, Bot, History, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
