@@ -15,12 +15,8 @@ const DataRow = ({ label, value, className, valueClassName }: { label: string, v
     const displayValue = (val: any) => {
         if (val === null || val === undefined || val === '' || (typeof val === 'number' && isNaN(val))) return 'N/A';
         if (typeof val === 'number') {
-           const fixedVal = val.toFixed(2).replace('.', ',');
-           // remove trailing zeros from decimal part if it's .00
-            if (fixedVal.endsWith(',00')) {
-                return fixedVal.substring(0, fixedVal.length - 3);
-            }
-            return fixedVal;
+           const fixedVal = val.toFixed(1).replace('.', ',');
+           return fixedVal;
         }
         return String(val);
     }
@@ -61,14 +57,14 @@ export function EngineLogViewer({ data }: { data: any }) {
   const totalUsed = flowmeterUsage + dailyUsageLtrs;
 
   const renderExhaust = (exhaust1: number, exhaust2: number) => {
-      const val1 = String(exhaust1?.toFixed(2) ?? '0,00').replace('.',',');
-      const val2 = String(exhaust2?.toFixed(2) ?? '0,00').replace('.',',');
+      const val1 = String(exhaust1?.toFixed(1) ?? '0,0').replace('.',',');
+      const val2 = String(exhaust2?.toFixed(1) ?? '0,0').replace('.',',');
       return `${val1} / ${val2}`;
   }
 
   const renderCooler = (coolerIn: number, coolerOut: number) => {
-    const val1 = String(coolerIn?.toFixed(2) ?? '0,00').replace('.',',');
-    const val2 = String(coolerOut?.toFixed(2) ?? '0,00').replace('.',',');
+    const val1 = String(coolerIn?.toFixed(1) ?? '0,0').replace('.',',');
+    const val2 = String(coolerOut?.toFixed(1) ?? '0,0').replace('.',',');
     return `${val1} / ${val2}`;
   }
 
@@ -86,11 +82,14 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <SectionTitle className="bg-red-600">M.E Port Side</SectionTitle>
                     <DataRow label="RPM" value={data.portside.rpm} />
                     <DataRow label="L.O. PRESS" value={data.portside.lo_press} />
-                    <DataRow label="Exhaust" value={renderExhaust(data.portside.exhaust1, data.portside.exhaust2)} valueClassName="text-right"/>
+                    <DataRow label="Exhaust 1" value={data.portside.exhaust1} />
+                    <DataRow label="Exhaust 2" value={data.portside.exhaust2} />
                     <DataRow label="Radiator" value={data.portside.radiator} />
                     <DataRow label="SW Temp" value={data.portside.sw_temp} />
-                    <DataRow label="F.W. COOLERS" value={renderCooler(data.portside.fw_coolers_in, data.portside.fw_coolers_out)} valueClassName="text-right" />
-                    <DataRow label="L.O. COOLERS" value={renderCooler(data.portside.lo_coolers_in, data.portside.lo_coolers_out)} valueClassName="text-right" />
+                    <DataRow label="F.W. COOLERS In" value={data.portside.fw_coolers_in} />
+                    <DataRow label="F.W. COOLERS Out" value={data.portside.fw_coolers_out} />
+                    <DataRow label="L.O. COOLERS In" value={data.portside.lo_coolers_in} />
+                    <DataRow label="L.O. COOLERS Out" value={data.portside.lo_coolers_out} />
                 </div>
                 )}
 
@@ -99,11 +98,14 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <SectionTitle className="bg-green-600">M.E Starboard</SectionTitle>
                     <DataRow label="RPM" value={data.starboard.rpm} />
                     <DataRow label="L.O. PRESS" value={data.starboard.lo_press} />
-                    <DataRow label="Exhaust" value={renderExhaust(data.starboard.exhaust1, data.starboard.exhaust2)} valueClassName="text-right"/>
+                    <DataRow label="Exhaust 1" value={data.starboard.exhaust1} />
+                    <DataRow label="Exhaust 2" value={data.starboard.exhaust2} />
                     <DataRow label="Radiator" value={data.starboard.radiator} />
                     <DataRow label="SW Temp" value={data.starboard.sw_temp} />
-                    <DataRow label="F.W. COOLERS" value={renderCooler(data.starboard.fw_coolers_in, data.starboard.fw_coolers_out)} valueClassName="text-right"/>
-                    <DataRow label="L.O. COOLERS" value={renderCooler(data.starboard.lo_coolers_in, data.starboard.lo_coolers_out)} valueClassName="text-right"/>
+                    <DataRow label="F.W. COOLERS In" value={data.starboard.fw_coolers_in} />
+                    <DataRow label="F.W. COOLERS Out" value={data.starboard.fw_coolers_out} />
+                    <DataRow label="L.O. COOLERS In" value={data.starboard.lo_coolers_in} />
+                    <DataRow label="L.O. COOLERS Out" value={data.starboard.lo_coolers_out} />
                 </div>
                 )}
 
@@ -135,8 +137,9 @@ export function EngineLogViewer({ data }: { data: any }) {
                 )}
                 
                 {data.flowmeter && (
-                     <div className="space-y-1 p-1">
-                        <DataGrid className="border-none">
+                     <div className="space-y-1 p-1 border border-muted-foreground/50 rounded-sm">
+                        <SectionTitle className="bg-cyan-500">FLOWMETER</SectionTitle>
+                        <DataGrid>
                            <DataCell>{(data.flowmeter.before ?? 0).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell>{(data.flowmeter.after ?? 0).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell span={2} className="bg-green-800/50 h-6 rounded-sm">{(flowmeterUsage).toFixed(1).replace('.',',')}</DataCell>
@@ -159,9 +162,9 @@ export function EngineLogViewer({ data }: { data: any }) {
                            <DataCell className="text-muted-foreground">AFTER</DataCell>
                            <DataCell>{((data.onduty?.before ?? 0)).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell>{((data.daily.after ?? 0)).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{((data.onduty?.before ?? 0) * 21).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{((data.daily.after ?? 0) * 21).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{dailyUsageLtrs.toFixed(1).replace('.',',')}</DataCell>
+                           <DataCell>{(((data.onduty?.before ?? 0)) * 21).toFixed(1).replace('.',',')}</DataCell>
+                           <DataCell>{(((data.daily.after ?? 0)) * 21).toFixed(1).replace('.',',')}</DataCell>
+                           <DataCell>{(dailyUsageLtrs).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell>{(data.flowmeter.before ?? 0).toFixed(1).replace('.',',')}</DataCell>
                         </DataGrid>
                     </div>
