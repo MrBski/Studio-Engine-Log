@@ -155,19 +155,12 @@ export default function PreviewPage() {
                             <DataRow label="">{renderInput('daily_tank.value3')}</DataRow>
 
                             <SectionTitle className="bg-purple-600">USED</SectionTitle>
-                            <HeaderRow labels={['BEFORE', 'AFTER']} />
-                            <div className="flex items-center gap-2">
-                                <div className="w-1/2"></div>
-                                <div className="w-1/4">{renderInput('used.before1')}</div>
-                                <div className="w-1/4">{renderInput('used.after1')}</div>
-                            </div>
-                             <div className="flex items-center gap-2">
-                                <div className="w-1/2"></div>
-                                <div className="w-1/4">{renderInput('used.before2')}</div>
-                                <div className="w-1/4">{renderInput('used.after2')}</div>
-                            </div>
-                            <DataRow label="">{renderInput('used.value1')}</DataRow>
-                            <DataRow label="">{renderInput('used.value2')}</DataRow>
+                            <DataRow label="Before 1">{renderInput('used.before1')}</DataRow>
+                            <DataRow label="After 1">{renderInput('used.after1')}</DataRow>
+                            <DataRow label="Before 2">{renderInput('used.before2')}</DataRow>
+                            <DataRow label="After 2">{renderInput('used.after2')}</DataRow>
+                            <DataRow label="Value 1">{renderInput('used.value1')}</DataRow>
+                            <DataRow label="Value 2">{renderInput('used.value2')}</DataRow>
 
                             <SectionTitle className="bg-slate-500">ROB</SectionTitle>
                             <DataRow label="">{renderInput('rob.val1')}</DataRow>
