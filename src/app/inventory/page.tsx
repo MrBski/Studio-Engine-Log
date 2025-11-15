@@ -30,6 +30,10 @@ function InventoryForm({ item, onSave, defaultCategory }: { item?: InventoryItem
     defaultValues: item || { name: '', quantity: 0, unit: '', location: '', category: defaultCategory },
   });
 
+  useEffect(() => {
+    form.reset(item || { name: '', quantity: 0, unit: '', location: '', category: defaultCategory });
+  }, [item, form, defaultCategory]);
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     onSave(values);
   };
@@ -204,46 +208,47 @@ export default function InventoryPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Archive className="h-6 w-6 text-primary" />
-          <h2 className="text-2xl font-headline font-bold text-foreground">Inventory List</h2>
+    <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <div className="space-y-8">
+        <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+            <Archive className="h-6 w-6 text-primary" />
+            <h2 className="text-2xl font-headline font-bold text-foreground">Inventory List</h2>
+            </div>
+            <DialogTrigger asChild>
+                <Button onClick={handleAddNew}>
+                <PlusCircle className="mr-2 h-4 w-4" /> Add New
+                </Button>
+            </DialogTrigger>
         </div>
-        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-          <DialogTrigger asChild>
-            <Button onClick={handleAddNew}>
-              <PlusCircle className="mr-2 h-4 w-4" /> Add New
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
+
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as InventoryCategory)} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="ME">Spare Part ME</TabsTrigger>
+            <TabsTrigger value="AE">Spare Part AE</TabsTrigger>
+            <TabsTrigger value="Others">Others</TabsTrigger>
+            </TabsList>
+            <TabsContent value="ME">
+            <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} />
+            </TabsContent>
+            <TabsContent value="AE">
+            <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} />
+            </TabsContent>
+            <TabsContent value="Others">
+            <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} />
+            </TabsContent>
+        </Tabs>
+        </div>
+
+        <DialogContent>
             <DialogHeader>
-              <DialogTitle>{editingItem ? 'Edit Item' : 'Add New Item'}</DialogTitle>
-              <DialogDescription>
+            <DialogTitle>{editingItem ? 'Edit Item' : 'Add New Item'}</DialogTitle>
+            <DialogDescription>
                 {editingItem ? 'Update the details for this inventory item.' : 'Fill in the details for the new inventory item.'}
-              </DialogDescription>
+            </DialogDescription>
             </DialogHeader>
             <InventoryForm item={editingItem} onSave={handleSave} defaultCategory={activeTab} />
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as InventoryCategory)} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="ME">Spare Part ME</TabsTrigger>
-          <TabsTrigger value="AE">Spare Part AE</TabsTrigger>
-          <TabsTrigger value="Others">Others</TabsTrigger>
-        </TabsList>
-        <TabsContent value="ME">
-          <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} />
-        </TabsContent>
-        <TabsContent value="AE">
-          <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} />
-        </TabsContent>
-        <TabsContent value="Others">
-          <InventoryList items={filteredInventory} onEdit={handleEdit} onDelete={deleteInventoryItem} />
-        </TabsContent>
-      </Tabs>
-    </div>
+        </DialogContent>
+    </Dialog>
   );
 }
