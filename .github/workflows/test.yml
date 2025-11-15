@@ -1,0 +1,14 @@
+name: Test Secret
+on: workflow_dispatch
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print token exist?
+        run: |
+          if [ -z "${{ secrets.TOKENKU }}" ]; then
+            echo "TOKEN TIDAK ADA"
+          else
+            echo "TOKEN ADA"
+          fi
