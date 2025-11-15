@@ -16,19 +16,13 @@ export default function HomePage() {
         <Button asChild size="lg" className="w-full h-20 text-xl font-headline shadow-lg transition-transform hover:scale-105" variant="outline">
           <Link href="/last-record">
             <History className="mr-4 h-8 w-8 text-primary" />
-            LAST RCD
+            Log Activity
           </Link>
         </Button>
         <Button asChild size="lg" className="w-full h-20 text-xl font-headline shadow-lg transition-transform hover:scale-105" variant="outline">
           <Link href="/inventory">
             <List className="mr-4 h-8 w-8 text-primary" />
             LIST INV
-          </Link>
-        </Button>
-        <Button asChild size="lg" className="w-full h-20 text-xl font-headline shadow-lg transition-transform hover:scale-105" variant="outline">
-          <Link href="/anomalies">
-            <Bot className="mr-4 h-8 w-8 text-primary" />
-            Detect Anomalies
           </Link>
         </Button>
       </div>

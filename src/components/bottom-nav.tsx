@@ -7,11 +7,11 @@ import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
 const navItems = [
-  { href: '/anomalies', icon: Bot, label: 'Anomalies' },
+  { href: '/last-record', icon: History, label: 'Activity' },
   { href: '/preview', icon: Camera, label: 'Input Log' },
   { href: '/', icon: Home, label: 'Home' },
   { href: '/inventory', icon: Archive, label: 'Inventory' },
-  { href: '/last-record', icon: History, label: 'History' },
+  { href: '/settings', icon: Settings, label: 'Settings' },
 ];
 
 export function BottomNav() {

@@ -64,3 +64,16 @@ export type EngineLogContextType = {
   engineLogs: EngineLogRecord[];
   addEngineLog: (sections: EngineLogSection[]) => void;
 };
+
+export interface Anomaly {
+    timestamp: string;
+    parameter: string;
+    expectedValue: number;
+    actualValue: number;
+    possibleCauses: string;
+    recommendedActions: string;
+}
+
+export interface DetectEngineAnomaliesOutput {
+    anomalies: Anomaly[];
+}

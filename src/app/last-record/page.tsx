@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 
-export default function LastRecordPage() {
+export default function LogActivityPage() {
   const { inventory } = useInventory();
   const { performaRecords, deletePerformaRecord } = usePerforma();
   const { engineLogs } = useEngineLog();
@@ -22,7 +22,7 @@ export default function LastRecordPage() {
     setIsClient(true);
   }, []);
 
-  const lastRecords = useMemo<LastRecord[]>(() => {
+  const allRecords = useMemo<LastRecord[]>(() => {
     if (!isClient) return [];
     
     const records: LastRecord[] = [];
@@ -46,7 +46,7 @@ export default function LastRecordPage() {
             const parsedKeterangan = JSON.parse(lastPerf.keterangan);
             if (parsedKeterangan && typeof parsedKeterangan === 'object' && 'datetime' in parsedKeterangan) {
               type = 'Engine Log';
-              summary = lastPerf.nama;
+              summary = `Engine Log Entry`;
               data = parsedKeterangan;
             }
         } catch (e) {
@@ -95,7 +95,7 @@ export default function LastRecordPage() {
         <div className="space-y-8">
             <div className="flex items-center gap-2">
                 <History className="h-6 w-6 text-primary" />
-                <h2 className="text-2xl font-headline font-bold text-foreground">Last Recorded Data</h2>
+                <h2 className="text-2xl font-headline font-bold text-foreground">Log Activity</h2>
             </div>
             <div className="space-y-4">
                 <Card>
@@ -113,11 +113,11 @@ export default function LastRecordPage() {
         <div className="space-y-8">
         <div className="flex items-center gap-2">
             <History className="h-6 w-6 text-primary" />
-            <h2 className="text-2xl font-headline font-bold text-foreground">Last Recorded Data</h2>
+            <h2 className="text-2xl font-headline font-bold text-foreground">Log Activity</h2>
         </div>
 
         <div className="space-y-4">
-            {lastRecords.length > 0 ? lastRecords.map((record) => (
+            {allRecords.length > 0 ? allRecords.map((record) => (
             <Card key={record.id} className="flex items-center justify-between p-4">
                 <div className="flex items-center gap-4">
                     {getIcon(record.type)}
@@ -147,7 +147,7 @@ export default function LastRecordPage() {
                                 <AlertDialogHeader>
                                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    This will permanently delete the record "{record.summary}".
+                                    This will permanently delete the record.
                                 </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
@@ -162,7 +162,7 @@ export default function LastRecordPage() {
             )) : (
             <Card>
                 <CardContent className="pt-6">
-                <p className="text-muted-foreground text-center">No recent records found.</p>
+                <p className="text-muted-foreground text-center">No recent activity found.</p>
                 </CardContent>
             </Card>
             )}
