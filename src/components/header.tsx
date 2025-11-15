@@ -1,7 +1,7 @@
 'use client';
 
 import { useShip } from '@/hooks/use-app';
-import { SeaPilotLogo } from './icons';
+import { EngineLogLogo } from './icons';
 import { useEffect, useState } from 'react';
 import { Skeleton } from './ui/skeleton';
 
@@ -17,7 +17,7 @@ export function Header() {
     <header className="sticky top-0 z-30 w-full bg-background/80 backdrop-blur-sm border-b">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-3">
-          <SeaPilotLogo className="h-8 w-8 text-primary" />
+          <EngineLogLogo className="h-8 w-8 text-primary" />
           <div className="flex flex-col">
             <h1 className="font-headline text-xl font-bold leading-tight">Engine Log</h1>
             {isMounted ? (

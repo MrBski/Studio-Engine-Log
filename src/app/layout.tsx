@@ -7,7 +7,7 @@ import { Header } from '@/components/header';
 import { BottomNav } from '@/components/bottom-nav';
 
 export const metadata: Metadata = {
-  title: 'Sea Pilot',
+  title: 'Engine Log',
   description: 'A ship management app for offline use.',
   manifest: "/manifest.json",
 };
