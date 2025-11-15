@@ -48,6 +48,7 @@ export default function PreviewPage() {
     onduty: { before: 77.0 },
     rob: 45914.0,
     used4hours: 0,
+    rob4hours: { hour1: 0, hour2: 0, hour3: 0, hour4: 0},
     user: { date: '', name: 'Mr. Basuki', position: '3/E' },
     condition: 'Engine Room in Good condition'
   };
@@ -59,6 +60,7 @@ export default function PreviewPage() {
   const watchedValues = watch();
   const ondutyBefore = watch('onduty.before');
   const dailyBefore = watch('daily.before');
+  const rob = watch('rob');
 
   useEffect(() => {
     const now = new Date();
@@ -69,8 +71,25 @@ export default function PreviewPage() {
   useEffect(() => {
     const onduty = parseFloat(String(ondutyBefore).replace(',', '.')) || 0;
     const daily = parseFloat(String(dailyBefore).replace(',', '.')) || 0;
-    setValue('used4hours', onduty - daily);
-  }, [ondutyBefore, dailyBefore, setValue]);
+    const used = onduty - daily;
+    setValue('used4hours', used);
+
+    const hourlyUsageLiters = (used / 4) * 21;
+    const initialRob = parseFloat(String(rob).replace(',', '.')) || 0;
+    
+    const h1 = initialRob - hourlyUsageLiters;
+    const h2 = h1 - hourlyUsageLiters;
+    const h3 = h2 - hourlyUsageLiters;
+    const h4 = h3 - hourlyUsageLiters;
+
+    setValue('rob4hours', {
+        hour1: h1,
+        hour2: h2,
+        hour3: h3,
+        hour4: h4,
+    });
+
+  }, [ondutyBefore, dailyBefore, rob, setValue]);
 
 
   const onSubmit = (data: any) => {

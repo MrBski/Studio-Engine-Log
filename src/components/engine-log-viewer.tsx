@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -55,7 +56,9 @@ export function EngineLogViewer({ data }: { data: any }) {
   const dailyUsageCm = (data.daily?.after ?? 0) - (data.daily?.before ?? 0);
   const dailyUsageLtrs = dailyUsageCm * 21;
   const usageDifference = dailyUsageLtrs - flowmeterUsage;
-  const hourlyUsage = ((data.onduty?.before ?? 0) - (data.daily?.before ?? 0)) / 4;
+  const used4hoursCm = (data.onduty?.before ?? 0) - (data.daily?.before ?? 0);
+  const hourlyUsageCm = used4hoursCm / 4;
+  const hourlyUsageLtrs = hourlyUsageCm * 21;
 
 
   const renderExhaust = (exhaust1: number, exhaust2: number) => {
@@ -158,7 +161,7 @@ export function EngineLogViewer({ data }: { data: any }) {
                 </div>
 
 
-                {data.daily && (
+                {data.daily && data.onduty && (
                     <div className="space-y-1 p-1 border border-muted-foreground/50 rounded-sm">
                         <SectionTitle className="bg-rose-800">USED</SectionTitle>
                          <DataGrid>
@@ -172,25 +175,30 @@ export function EngineLogViewer({ data }: { data: any }) {
                            <DataCell>{(((data.daily.after ?? 0)) * 21).toFixed(1).replace('.',',')}</DataCell>
                            {/* Summary */}
                            <DataCell>{(dailyUsageLtrs).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{(data.flowmeter.before ?? 0).toFixed(1).replace('.',',')}</DataCell>
+                           <DataCell>{(flowmeterUsage).toFixed(1).replace('.',',')}</DataCell>
                         </DataGrid>
 
                         <div className="space-y-1 p-1 border-t border-muted-foreground/50 mt-2 pt-2">
                             <SectionTitle className="bg-blue-800">Pemakaian Per Jam</SectionTitle>
                              <DataGrid className="border-none">
-                                <DataCell span={2} className="bg-blue-800/50 h-6 rounded-sm">{(hourlyUsage).toFixed(2).replace('.',',')} ltrs/jam</DataCell>
+                                <DataCell span={2} className="bg-blue-800/50 h-6 rounded-sm">{(hourlyUsageLtrs).toFixed(2).replace('.',',')} ltrs/jam</DataCell>
                             </DataGrid>
                         </div>
                     </div>
                 )}
-
-                <div className="space-y-1 p-1 border border-muted-foreground/50 rounded-sm">
-                    <SectionTitle className="bg-gray-500">ROB</SectionTitle>
-                    <DataGrid className="border-none">
-                        <DataCell>{(data.rob ?? 0).toFixed(1).replace('.',',')}</DataCell>
-                        <DataCell>{(data.rob - flowmeterUsage).toFixed(1).replace('.',',')}</DataCell>
-                    </DataGrid>
-                </div>
+                
+                {data.rob4hours && (
+                    <div className="space-y-1 p-1 border border-muted-foreground/50 rounded-sm">
+                        <SectionTitle className="bg-gray-500">ROB for 4 Hours</SectionTitle>
+                         <DataGrid>
+                            <DataCell>{(data.rob ?? 0).toFixed(1).replace('.',',')}</DataCell>
+                            <DataCell>{(data.rob4hours.hour1).toFixed(1).replace('.',',')}</DataCell>
+                            <DataCell>{(data.rob4hours.hour2).toFixed(1).replace('.',',')}</DataCell>
+                            <DataCell>{(data.rob4hours.hour3).toFixed(1).replace('.',',')}</DataCell>
+                            <DataCell span={2}>{(data.rob4hours.hour4).toFixed(1).replace('.',',')}</DataCell>
+                        </DataGrid>
+                    </div>
+                )}
             </div>
         </div>
 
