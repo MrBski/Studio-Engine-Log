@@ -166,19 +166,20 @@ export function EngineLogViewer({ data }: { data: any }) {
                 {data.daily && data.onduty && (
                     <div className="space-y-1 p-1 border border-muted-foreground/50 rounded-sm">
                         <SectionTitle className="bg-rose-800">USED</SectionTitle>
-                         <DataGrid>
-                           <DataCell className="text-muted-foreground">BEFORE</DataCell>
-                           <DataCell className="text-muted-foreground">AFTER</DataCell>
-                           {/* Onduty before and daily after */}
-                           <DataCell>{((data.onduty?.before ?? 0)).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{((data.daily.after ?? 0)).toFixed(1).replace('.',',')}</DataCell>
-                           {/* Converted to Liters */}
-                           <DataCell>{(((data.onduty?.before ?? 0)) * 21).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{(((data.daily.after ?? 0)) * 21).toFixed(1).replace('.',',')}</DataCell>
-                           {/* Summary */}
-                           <DataCell>{(dailyUsageLtrs).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{(flowmeterUsage).toFixed(1).replace('.',',')}</DataCell>
-                        </DataGrid>
+                        <div className="grid grid-cols-2 gap-x-2">
+                            <div className="flex flex-col text-center">
+                                <DataCell className="text-muted-foreground">BEFORE</DataCell>
+                                <DataCell>{(data.onduty?.before ?? 0).toFixed(1).replace('.', ',')}</DataCell>
+                                <DataCell>{((data.onduty?.before ?? 0) * 21).toFixed(1).replace('.', ',')}</DataCell>
+                                <DataCell>{(dailyUsageLtrs).toFixed(1).replace('.', ',')}</DataCell>
+                            </div>
+                            <div className="flex flex-col text-center">
+                                <DataCell className="text-muted-foreground">AFTER</DataCell>
+                                <DataCell>{(data.daily.after ?? 0).toFixed(1).replace('.', ',')}</DataCell>
+                                <DataCell>{((data.daily.after ?? 0) * 21).toFixed(1).replace('.', ',')}</DataCell>
+                                <DataCell>{(flowmeterUsage).toFixed(1).replace('.', ',')}</DataCell>
+                            </div>
+                        </div>
 
                         <div className="space-y-1 p-1 border-t border-muted-foreground/50 mt-2 pt-2">
                             <SectionTitle className="bg-blue-800">Pemakaian Per Jam</SectionTitle>
