@@ -34,7 +34,7 @@ export function EngineLogViewer({ data }: { data: any }) {
   const formattedDate = parsedDate && isValid(parsedDate) ? format(parsedDate, "Pp") : 'N/A';
 
   const flowmeterUsage = data.flowmeter ? data.flowmeter.after - data.flowmeter.before : 0;
-  const dailyUsage = data.daily ? data.daily.after - data.daily.before : 0;
+  const dailyUsage = data.daily ? (data.daily.after - data.daily.before) * 21 : 0;
 
   return (
     <div className="space-y-4 pb-8 bg-card p-4 rounded-lg">
@@ -103,7 +103,7 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <SectionTitle className="bg-purple-600">Daily</SectionTitle>
                     <DataRow label="Before" value={data.daily.before} />
                     <DataRow label="After" value={data.daily.after} />
-                    <DataRow label="Used" value={dailyUsage} className="font-bold text-accent-foreground bg-accent/20" />
+                    <DataRow label="Used (ltrs)" value={dailyUsage} className="font-bold text-accent-foreground bg-accent/20" />
                 </div>
                 )}
                 
