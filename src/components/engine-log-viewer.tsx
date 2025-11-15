@@ -60,6 +60,13 @@ export function EngineLogViewer({ data }: { data: any }) {
   const used4hoursCm = (data.onduty?.before ?? 0) - (data.daily?.before ?? 0);
   const hourlyUsageCm = used4hoursCm / 4;
   const hourlyUsageLtrs = hourlyUsageCm * 21;
+  const roundedHourlyUsage = Math.round(hourlyUsageLtrs);
+  
+  const rob = data.rob ?? 0;
+  const robH1 = rob - roundedHourlyUsage;
+  const robH2 = robH1 - roundedHourlyUsage;
+  const robH3 = robH2 - roundedHourlyUsage;
+  const robH4 = robH3 - roundedHourlyUsage;
 
 
   const renderExhaust = (exhaust1: number, exhaust2: number) => {
@@ -168,30 +175,28 @@ export function EngineLogViewer({ data }: { data: any }) {
                         <div className="space-y-1 p-1">
                             <SectionTitle className="bg-blue-800">Pemakaian Per Jam</SectionTitle>
                              <DataGrid className="border-none">
-                                <DataCell span={2} className="bg-blue-800/50 h-6 rounded-sm">{(hourlyUsageLtrs).toFixed(2).replace('.',',')} ltrs/jam</DataCell>
+                                <DataCell span={2} className="bg-blue-800/50 h-6 rounded-sm">{(roundedHourlyUsage).toFixed(2).replace('.',',')} ltrs/jam</DataCell>
                             </DataGrid>
                         </div>
                     </div>
                 )}
                 
-                {data.rob4hours && (
-                    <div className="space-y-1 p-1 border border-muted-foreground/50 rounded-sm">
-                        <SectionTitle className="bg-gray-700">USED</SectionTitle>
-                        <div className="grid grid-cols-2">
-                            <div className="bg-green-500 text-black font-bold text-lg flex items-center justify-center rounded-l-sm">
-                                <div className="text-center">
-                                    <p className="border-b border-black">{(data.rob ?? 0).toFixed(0)}</p>
-                                </div>
-                            </div>
-                            <div className="flex flex-col text-right">
-                                <DataCell className="bg-rose-100/10 h-6 border-b border-muted-foreground/20">{(data.rob4hours.hour1).toFixed(0)}</DataCell>
-                                <DataCell className="bg-rose-100/10 h-6 border-b border-muted-foreground/20">{(data.rob4hours.hour2).toFixed(0)}</DataCell>
-                                <DataCell className="bg-rose-100/10 h-6 border-b border-muted-foreground/20">{(data.rob4hours.hour3).toFixed(0)}</DataCell>
-                                <DataCell className="bg-rose-100/10 h-6">{(data.rob4hours.hour4).toFixed(0)}</DataCell>
+                <div className="space-y-1 p-1 border border-muted-foreground/50 rounded-sm">
+                    <SectionTitle className="bg-gray-700">USED</SectionTitle>
+                    <div className="grid grid-cols-2">
+                        <div className="bg-green-500 text-black font-bold text-lg flex items-center justify-center rounded-l-sm">
+                            <div className="text-center">
+                                <p className="border-b border-black">{(rob).toFixed(0)}</p>
                             </div>
                         </div>
+                        <div className="flex flex-col text-right">
+                            <DataCell className="bg-rose-100/10 h-6 border-b border-muted-foreground/20">{robH1.toFixed(0)}</DataCell>
+                            <DataCell className="bg-rose-100/10 h-6 border-b border-muted-foreground/20">{robH2.toFixed(0)}</DataCell>
+                            <DataCell className="bg-rose-100/10 h-6 border-b border-muted-foreground/20">{robH3.toFixed(0)}</DataCell>
+                            <DataCell className="bg-rose-100/10 h-6">{robH4.toFixed(0)}</DataCell>
+                        </div>
                     </div>
-                )}
+                </div>
             </div>
         </div>
 

@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -74,13 +75,16 @@ export default function PreviewPage() {
     const used = onduty - daily;
     setValue('used4hours', used);
 
-    const hourlyUsageLiters = (used / 4) * 21;
+    const hourlyUsageCm = used / 4;
+    const hourlyUsageLtrs = hourlyUsageCm * 21;
+    const roundedHourlyUsage = Math.round(hourlyUsageLtrs);
+    
     const initialRob = parseFloat(String(rob).replace(',', '.')) || 0;
     
-    const h1 = initialRob - hourlyUsageLiters;
-    const h2 = h1 - hourlyUsageLiters;
-    const h3 = h2 - hourlyUsageLiters;
-    const h4 = h3 - hourlyUsageLiters;
+    const h1 = initialRob - roundedHourlyUsage;
+    const h2 = h1 - roundedHourlyUsage;
+    const h3 = h2 - roundedHourlyUsage;
+    const h4 = h3 - roundedHourlyUsage;
 
     setValue('rob4hours', {
         hour1: h1,
