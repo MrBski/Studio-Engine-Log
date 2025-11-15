@@ -61,10 +61,13 @@ export default function PreviewPage() {
 
   const onSubmit = (data: any) => {
     try {
+      // Convert comma decimal separators to periods for JSON compatibility
+      const sanitizedData = JSON.parse(JSON.stringify(data).replace(/,/g, '.'));
+
       const performaData = {
-        nama: `Engine Log - ${format(new Date(data.datetime), 'yyyy-MM-dd HH:mm')}`,
-        tanggal: new Date(data.datetime).toISOString(),
-        keterangan: JSON.stringify(data),
+        nama: `Engine Log - ${format(new Date(sanitizedData.datetime), 'yyyy-MM-dd HH:mm')}`,
+        tanggal: new Date(sanitizedData.datetime).toISOString(),
+        keterangan: JSON.stringify(sanitizedData),
         jumlah: 1, // Represents one log entry
       };
 
@@ -86,7 +89,9 @@ export default function PreviewPage() {
   };
 
   const renderInput = (name: any) => (
-    <Input {...register(name, {valueAsNumber: true})} type="number" className="bg-card-foreground/5 h-8 text-right text-sm" />
+    <Input {...register(name, {
+        setValueAs: v => v.replace(',', '.') // ensure comma is treated as decimal point
+    })} type="tel" inputMode="decimal" className="bg-card-foreground/5 h-8 text-right text-sm" />
   );
 
   return (
@@ -155,12 +160,22 @@ export default function PreviewPage() {
                             <DataRow label="">{renderInput('daily_tank.value3')}</DataRow>
 
                             <SectionTitle className="bg-purple-600">USED</SectionTitle>
-                            <DataRow label="Before">{renderInput('used.before1')}</DataRow>
-                            <DataRow label="After">{renderInput('used.after1')}</DataRow>
-                            <DataRow label="Value 1">{renderInput('used.value1')}</DataRow>
-                            <DataRow label="Before">{renderInput('used.before2')}</DataRow>
-                            <DataRow label="After">{renderInput('used.after2')}</DataRow>
-                            <DataRow label="Value 2">{renderInput('used.value2')}</DataRow>
+                            <div className="space-y-3">
+                                <HeaderRow labels={['BEFORE', 'AFTER']} />
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1/2"></div>
+                                    <div className="w-1/4">{renderInput('used.before1')}</div>
+                                    <div className="w-1/4">{renderInput('used.after1')}</div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1/2"></div>
+                                    <div className="w-1/4">{renderInput('used.before2')}</div>
+                                    <div className="w-1/4">{renderInput('used.after2')}</div>
+                                </div>
+                                <DataRow label="">{renderInput('used.value1')}</DataRow>
+                                <DataRow label="">{renderInput('used.value2')}</DataRow>
+                            </div>
+
 
                             <SectionTitle className="bg-slate-500">ROB</SectionTitle>
                             <DataRow label="">{renderInput('rob.val1')}</DataRow>
