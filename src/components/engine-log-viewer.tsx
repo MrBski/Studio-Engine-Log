@@ -18,8 +18,10 @@ const DataRow = ({ label, value, className, valueClassName }: { label: string, v
     const displayValue = (val: any) => {
         if (val === null || val === undefined || val === '' || (typeof val === 'number' && isNaN(val))) return 'N/A';
         if (typeof val === 'number') {
-           const fixedVal = val.toFixed(1).replace('.', ',');
-           return fixedVal;
+           if (val % 1 === 0) { // It's an integer
+                return String(val);
+           }
+           return val.toFixed(1).replace('.', ','); // It's a float
         }
         return String(val);
     }
@@ -73,15 +75,21 @@ export function EngineLogViewer({ data }: { data: any }) {
   const robH4 = robH3 - roundedHourlyUsage;
 
 
+  const formatNumber = (num: number) => {
+      if (num === null || num === undefined || isNaN(num)) return 'N/A';
+      if (num % 1 === 0) return String(num);
+      return num.toFixed(1).replace('.', ',');
+  }
+
   const renderExhaust = (exhaust1: number, exhaust2: number) => {
-      const val1 = String(exhaust1?.toFixed(1) ?? '0,0').replace('.',',');
-      const val2 = String(exhaust2?.toFixed(1) ?? '0,0').replace('.',',');
+      const val1 = formatNumber(exhaust1);
+      const val2 = formatNumber(exhaust2);
       return `${val1} / ${val2}`;
   }
 
   const renderCooler = (coolerIn: number, coolerOut: number) => {
-    const val1 = String(coolerIn?.toFixed(1) ?? '0,0').replace('.',',');
-    const val2 = String(coolerOut?.toFixed(1) ?? '0,0').replace('.',',');
+    const val1 = formatNumber(coolerIn);
+    const val2 = formatNumber(coolerOut);
     return `${val1} / ${val2}`;
   }
 
@@ -145,12 +153,12 @@ export function EngineLogViewer({ data }: { data: any }) {
                         <DataGrid>
                            <DataCell className="text-muted-foreground">BEFORE</DataCell>
                            <DataCell className="text-muted-foreground">AFTER</DataCell>
-                           <DataCell>{(data.daily.before ?? 0).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{(data.daily.after ?? 0).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{((data.daily.before ?? 0) * dailyTankMultiplier).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{((data.daily.after ?? 0) * dailyTankMultiplier).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell span={2} className="bg-purple-800/50 h-6 rounded-sm">{(dailyUsageCm).toFixed(1).replace('.',',')} cm</DataCell>
-                           <DataCell span={2} className="bg-purple-800/50 h-6 rounded-sm mt-1">{(dailyUsageLtrs).toFixed(1).replace('.',',')} ltrs</DataCell>
+                           <DataCell>{formatNumber(data.daily.before ?? 0)}</DataCell>
+                           <DataCell>{formatNumber(data.daily.after ?? 0)}</DataCell>
+                           <DataCell>{formatNumber((data.daily.before ?? 0) * dailyTankMultiplier)}</DataCell>
+                           <DataCell>{formatNumber((data.daily.after ?? 0) * dailyTankMultiplier)}</DataCell>
+                           <DataCell span={2} className="bg-purple-800/50 h-6 rounded-sm">{formatNumber(dailyUsageCm)} cm</DataCell>
+                           <DataCell span={2} className="bg-purple-800/50 h-6 rounded-sm mt-1">{formatNumber(dailyUsageLtrs)} ltrs</DataCell>
                         </DataGrid>
                     </div>
                 )}
@@ -159,9 +167,9 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <div className="space-y-1 p-1 border border-muted-foreground/50 rounded-sm">
                         <SectionTitle className="bg-cyan-500">FLOWMETER</SectionTitle>
                          <DataGrid>
-                           <DataCell>{(data.flowmeter.before ?? 0).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{(data.flowmeter.after ?? 0).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell span={2} className="bg-green-800/50 h-6 rounded-sm">{(flowmeterUsage).toFixed(1).replace('.',',')}</DataCell>
+                           <DataCell>{formatNumber(data.flowmeter.before ?? 0)}</DataCell>
+                           <DataCell>{formatNumber(data.flowmeter.after ?? 0)}</DataCell>
+                           <DataCell span={2} className="bg-green-800/50 h-6 rounded-sm">{formatNumber(flowmeterUsage)}</DataCell>
                         </DataGrid>
                     </div>
                 )}
@@ -169,7 +177,7 @@ export function EngineLogViewer({ data }: { data: any }) {
                 <div className="space-y-1 p-1 border border-muted-foreground/50 rounded-sm">
                     <SectionTitle className="bg-yellow-600">Difference</SectionTitle>
                     <DataGrid className='border-none'>
-                        <DataCell span={2} className="bg-yellow-600/50 h-6 rounded-sm">{(usageDifference).toFixed(1).replace('.',',')}</DataCell>
+                        <DataCell span={2} className="bg-yellow-600/50 h-6 rounded-sm">{formatNumber(usageDifference)}</DataCell>
                     </DataGrid>
                 </div>
 
@@ -179,11 +187,11 @@ export function EngineLogViewer({ data }: { data: any }) {
                         <div className="space-y-1 p-1">
                             <SectionTitle className="bg-blue-800">Pemakaian Per Jam</SectionTitle>
                              <DataGrid className="border-none">
-                                <DataCell span={2} className="bg-blue-800/50 h-6 rounded-sm">{(hourlyUsageLtrs).toFixed(2).replace('.',',')} ltrs/jam</DataCell>
+                                <DataCell span={2} className="bg-blue-800/50 h-6 rounded-sm">{hourlyUsageLtrs.toFixed(2).replace('.',',')} ltrs/jam</DataCell>
                             </DataGrid>
                             <SectionTitle className="bg-blue-800 mt-2">Pembulatan</SectionTitle>
                              <DataGrid className="border-none">
-                                <DataCell span={2} className="bg-blue-800/50 h-6 rounded-sm">{(roundedHourlyUsage).toFixed(2).replace('.',',')} ltrs/jam</DataCell>
+                                <DataCell span={2} className="bg-blue-800/50 h-6 rounded-sm">{roundedHourlyUsage.toFixed(2).replace('.',',')} ltrs/jam</DataCell>
                             </DataGrid>
                         </div>
                     </div>
@@ -194,14 +202,14 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <div className="grid grid-cols-2">
                         <div className="bg-green-500 text-black font-bold text-lg flex items-center justify-center rounded-l-sm">
                             <div className="text-center">
-                                <p className="border-b border-black">{(rob).toFixed(0)}</p>
+                                <p className="border-b border-black">{formatNumber(rob)}</p>
                             </div>
                         </div>
                         <div className="flex flex-col text-right">
-                            <DataCell className="bg-rose-100/10 h-6 border-b border-muted-foreground/20">{robH1.toFixed(0)}</DataCell>
-                            <DataCell className="bg-rose-100/10 h-6 border-b border-muted-foreground/20">{robH2.toFixed(0)}</DataCell>
-                            <DataCell className="bg-rose-100/10 h-6 border-b border-muted-foreground/20">{robH3.toFixed(0)}</DataCell>
-                            <DataCell className="bg-rose-100/10 h-6">{robH4.toFixed(0)}</DataCell>
+                            <DataCell className="bg-rose-100/10 h-6 border-b border-muted-foreground/20">{formatNumber(robH1)}</DataCell>
+                            <DataCell className="bg-rose-100/10 h-6 border-b border-muted-foreground/20">{formatNumber(robH2)}</DataCell>
+                            <DataCell className="bg-rose-100/10 h-6 border-b border-muted-foreground/20">{formatNumber(robH3)}</DataCell>
+                            <DataCell className="bg-rose-100/10 h-6">{formatNumber(robH4)}</DataCell>
                         </div>
                     </div>
                 </div>
