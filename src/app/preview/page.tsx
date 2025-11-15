@@ -157,7 +157,7 @@ export default function PreviewPage() {
 
   const renderInput = (name: any) => (
     <Input {...register(name, {
-        setValueAs: v => parseFloat(String(v).replace(',', '.'))
+        setValueAs: v => parseFloat(String(v).replace(',', '.')) || 0
     })} type="tel" inputMode="decimal" className="bg-card-foreground/5 h-8 text-right text-sm" onKeyDown={handleKeyDown}/>
   );
 
@@ -271,5 +271,7 @@ export default function PreviewPage() {
     </div>
   );
 }
+
+    
 
     
