@@ -5,12 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Settings, FileUp, FileDown, RefreshCw } from 'lucide-react';
+import { Settings, FileUp, FileDown } from 'lucide-react';
 import { importFromXlsx, exportToXlsx } from '@/lib/services/fileService';
-import { syncWithServer } from '@/lib/services/syncService';
 import { useRef, type ChangeEvent, useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import type { AppSettings } from '@/lib/types';
 
 export default function SettingsPage() {
   const { shipName, setShipName: setContextShipName } = useShip();
@@ -70,21 +68,6 @@ export default function SettingsPage() {
         console.error(error);
     }
   };
-  
-  const handleSync = async () => {
-    toast({ title: "Syncing...", description: "Attempting to sync data with the server." });
-    try {
-      await syncWithServer({ inventory, performaRecords });
-      toast({ title: "Sync Successful", description: "Your data is now up-to-date." });
-    } catch (error) {
-       toast({
-          variant: "destructive",
-          title: "Sync Failed",
-          description: "Could not connect to the server. Please try again later.",
-        });
-      console.error(error);
-    }
-  };
 
   const handleNameSave = () => {
     setContextShipName(localShipName);
@@ -128,7 +111,7 @@ export default function SettingsPage() {
             <div className="space-y-2">
               <Label htmlFor="shipName">Ship Name</Label>
               <div className="flex gap-2">
-                <Input id="shipName" value={localShipName || ''} onChange={(e) => setLocalShipName(e.target.value)} placeholder="e.g., MV Sea Pilot" />
+                <Input id="shipName" value={localShipName || ''} onChange={(e) => setLocalShipName(e.target.value)} placeholder="e.g., MV Engine Log" />
                 <Button onClick={handleNameSave}>Save</Button>
               </div>
             </div>
@@ -174,9 +157,9 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Data Management</CardTitle>
-            <CardDescription>Import, export, or sync your ship's data. Useful for backups and sharing.</CardDescription>
+            <CardDescription>Import or export your ship's data. Syncing is now automatic.</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+          <CardContent className="grid gap-4 sm:grid-cols-2">
              <input
               type="file"
               ref={fileInputRef}
@@ -191,10 +174,6 @@ export default function SettingsPage() {
             <Button variant="outline" onClick={handleExport}>
               <FileDown className="mr-2 h-4 w-4" />
               Export to XLSX
-            </Button>
-            <Button onClick={handleSync}>
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Sync with Server
             </Button>
           </CardContent>
         </Card>
