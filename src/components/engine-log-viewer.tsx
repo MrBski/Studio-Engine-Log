@@ -49,7 +49,8 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <SectionTitle className="bg-red-600">M.E Port Side</SectionTitle>
                     <DataRow label="RPM" value={data.portside.rpm} />
                     <DataRow label="L.O. PRESS" value={data.portside.lo_press} />
-                    <DataRow label="Exhaust" value={data.portside.exhaust} />
+                    <DataRow label="Exhaust 1" value={data.portside.exhaust1} />
+                    <DataRow label="Exhaust 2" value={data.portside.exhaust2} />
                     <DataRow label="Radiator" value={data.portside.radiator} />
                     <DataRow label="SW Temp" value={data.portside.sw_temp} />
                     <DataRow label="F.W. COOLERS" value={data.portside.fw_coolers} />
@@ -62,7 +63,8 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <SectionTitle className="bg-green-600">M.E Starboard</SectionTitle>
                     <DataRow label="RPM" value={data.starboard.rpm} />
                     <DataRow label="L.O. PRESS" value={data.starboard.lo_press} />
-                    <DataRow label="Exhaust" value={data.starboard.exhaust} />
+                    <DataRow label="Exhaust 1" value={data.starboard.exhaust1} />
+                    <DataRow label="Exhaust 2" value={data.starboard.exhaust2} />
                     <DataRow label="Radiator" value={data.starboard.radiator} />
                     <DataRow label="SW Temp" value={data.starboard.sw_temp} />
                     <DataRow label="F.W. COOLERS" value={data.starboard.fw_coolers} />
