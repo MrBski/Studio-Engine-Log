@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, PlusCircle, Camera, Archive, Settings } from 'lucide-react';
+import { Home, Camera, Archive, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
 const navItems = [
-  { href: '/input', icon: PlusCircle, label: 'Input' },
+  { href: '/anomalies', icon: Camera, label: 'Anomalies' },
   { href: '/preview', icon: Camera, label: 'Preview' },
   { href: '/', icon: Home, label: 'Home' },
   { href: '/inventory', icon: Archive, label: 'Inventory' },
@@ -38,6 +38,8 @@ export function BottomNav() {
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const isCenter = item.label === 'Home';
+          
+          if (item.href === '/anomalies') return null;
           
           return (
             <Link
