@@ -9,20 +9,14 @@ export default function HomePage() {
       <div className="w-full max-w-md space-y-4 pt-4">
         <Button asChild size="lg" className="w-full h-20 text-xl font-headline shadow-lg transition-transform hover:scale-105" variant="outline">
           <Link href="/performa">
-            <Gauge className="mr-4 h-8 w-8 text-primary" />
-            On Duty
+            <History className="mr-4 h-8 w-8 text-primary" />
+            LAST RCD
           </Link>
         </Button>
         <Button asChild size="lg" className="w-full h-20 text-xl font-headline shadow-lg transition-transform hover:scale-105" variant="outline">
           <Link href="/inventory">
             <List className="mr-4 h-8 w-8 text-primary" />
             LIST INV
-          </Link>
-        </Button>
-        <Button asChild size="lg" className="w-full h-20 text-xl font-headline shadow-lg transition-transform hover:scale-105" variant="outline">
-          <Link href="/last-record">
-            <History className="mr-4 h-8 w-8 text-primary" />
-            LAST RCD
           </Link>
         </Button>
         <Button asChild size="lg" className="w-full h-20 text-xl font-headline shadow-lg transition-transform hover:scale-105" variant="default">
