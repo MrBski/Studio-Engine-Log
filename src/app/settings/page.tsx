@@ -1,6 +1,6 @@
 'use client';
 
-import { useShip, useInventory, usePerforma } from '@/hooks/use-app';
+import { useShip, useInventory, usePerforma, useEngineLog } from '@/hooks/use-app';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Settings, FileUp, FileDown, RefreshCw } from 'lucide-react';
 import { importFromXlsx, exportToXlsx } from '@/lib/services/fileService';
 import { syncWithServer } from '@/lib/services/syncService';
-import { useRef, type ChangeEvent } from 'react';
+import { useRef, type ChangeEvent, useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function SettingsPage() {
@@ -19,9 +19,9 @@ export default function SettingsPage() {
   const { toast } = useToast();
   
   // Local state for input to avoid updating context on every keystroke
-  const [localShipName, setLocalShipName] = React.useState(shipName);
+  const [localShipName, setLocalShipName] = useState(shipName);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setLocalShipName(shipName);
   }, [shipName]);
 

@@ -2,16 +2,16 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Camera, Archive, Settings } from 'lucide-react';
+import { Home, Camera, Archive, Settings, Bot, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
 const navItems = [
-  { href: '/anomalies', icon: Camera, label: 'Anomalies' },
-  { href: '/preview', icon: Camera, label: 'Preview' },
+  { href: '/anomalies', icon: Bot, label: 'Anomalies' },
+  { href: '/preview', icon: Camera, label: 'Input Log' },
   { href: '/', icon: Home, label: 'Home' },
   { href: '/inventory', icon: Archive, label: 'Inventory' },
-  { href: '/settings', icon: Settings, label: 'Settings' },
+  { href: '/last-record', icon: History, label: 'History' },
 ];
 
 export function BottomNav() {
@@ -39,8 +39,6 @@ export function BottomNav() {
           const isActive = pathname === item.href;
           const isCenter = item.label === 'Home';
           
-          if (item.href === '/anomalies') return null;
-          
           return (
             <Link
               key={item.href}
@@ -59,7 +57,7 @@ export function BottomNav() {
               </div>
 
               <span className={cn(
-                  "text-xs transition-opacity duration-300",
+                  "text-xs transition-opacity duration-300 text-center",
                   isCenter ? 'absolute bottom-2 font-medium' : 'mt-1',
                   isActive ? 'text-primary' : 'text-muted-foreground',
                   isCenter && 'text-foreground'
