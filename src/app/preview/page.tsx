@@ -86,7 +86,7 @@ export default function PreviewPage() {
   };
 
   const renderInput = (name: any) => (
-    <Input {...register(name, {valueAsNumber: true})} type="number" step="0.1" className="bg-card-foreground/5 h-8 text-right text-sm" />
+    <Input {...register(name, {valueAsNumber: true})} type="number" className="bg-card-foreground/5 h-8 text-right text-sm" />
   );
 
   return (
@@ -106,7 +106,7 @@ export default function PreviewPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* LEFT COLUMN */}
                         <div className="space-y-3">
-                            <SectionTitle className="bg-destructive">M. E PORTSIDE</SectionTitle>
+                            <SectionTitle className="bg-red-600">M. E PORTSIDE</SectionTitle>
                             <DataRow label="RPM">{renderInput('portside.rpm')}</DataRow>
                             <DataRow label="L. O PRESS">{renderInput('portside.lo_press')}</DataRow>
                             <DataRow label="Exhaust">{renderInput('portside.exhaust')}</DataRow>
@@ -155,11 +155,11 @@ export default function PreviewPage() {
                             <DataRow label="">{renderInput('daily_tank.value3')}</DataRow>
 
                             <SectionTitle className="bg-purple-600">USED</SectionTitle>
-                            <DataRow label="Before 1">{renderInput('used.before1')}</DataRow>
-                            <DataRow label="After 1">{renderInput('used.after1')}</DataRow>
-                            <DataRow label="Before 2">{renderInput('used.before2')}</DataRow>
-                            <DataRow label="After 2">{renderInput('used.after2')}</DataRow>
+                            <DataRow label="Before">{renderInput('used.before1')}</DataRow>
+                            <DataRow label="After">{renderInput('used.after1')}</DataRow>
                             <DataRow label="Value 1">{renderInput('used.value1')}</DataRow>
+                            <DataRow label="Before">{renderInput('used.before2')}</DataRow>
+                            <DataRow label="After">{renderInput('used.after2')}</DataRow>
                             <DataRow label="Value 2">{renderInput('used.value2')}</DataRow>
 
                             <SectionTitle className="bg-slate-500">ROB</SectionTitle>
