@@ -8,6 +8,8 @@ export const SettingsContext = createContext<SettingsContextType | undefined>(un
 
 const defaultSettings: AppSettings = {
   dailyTankMultiplier: 21,
+  engineerName: 'Mr. Basuki',
+  engineerPosition: '3/E',
 };
 
 export function SettingsProvider({ children }: { children: ReactNode }) {

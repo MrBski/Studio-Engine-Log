@@ -104,9 +104,10 @@ export default function SettingsPage() {
 
   const handleSettingsChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    const isNumber = e.target.type === 'number';
     setLocalSettings(prev => ({
       ...prev,
-      [name]: Number(value)
+      [name]: isNumber ? Number(value) : value,
     }));
   }
 
@@ -133,6 +134,26 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>On-Duty Engineer</CardTitle>
+            <CardDescription>Set the default engineer for new log sheets.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="engineerName">Engineer Name</Label>
+               <Input id="engineerName" name="engineerName" value={localSettings.engineerName} onChange={handleSettingsChange} placeholder="e.g., Mr. Basuki" />
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="engineerPosition">Engineer Position</Label>
+              <Input id="engineerPosition" name="engineerPosition" value={localSettings.engineerPosition} onChange={handleSettingsChange} placeholder="e.g., 3/E" />
+            </div>
+             <div className="pt-2">
+                <Button onClick={handleSettingsSave}>Save Engineer Details</Button>
+              </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
@@ -142,10 +163,10 @@ export default function SettingsPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="dailyTankMultiplier">Daily Tank Multiplier (cm to Ltrs)</Label>
-              <div className="flex gap-2">
-                <Input id="dailyTankMultiplier" name="dailyTankMultiplier" type="number" value={localSettings.dailyTankMultiplier} onChange={handleSettingsChange} placeholder="e.g., 21" />
-                <Button onClick={handleSettingsSave}>Save</Button>
-              </div>
+               <Input id="dailyTankMultiplier" name="dailyTankMultiplier" type="number" value={localSettings.dailyTankMultiplier} onChange={handleSettingsChange} placeholder="e.g., 21" />
+            </div>
+            <div className="pt-2">
+              <Button onClick={handleSettingsSave}>Save Calculation Settings</Button>
             </div>
           </CardContent>
         </Card>

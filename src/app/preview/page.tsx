@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -37,22 +35,22 @@ export default function PreviewPage() {
   const { toast } = useToast();
   const { addPerformaRecord } = usePerforma();
   const { settings } = useSettings();
-  const { dailyTankMultiplier } = settings;
+  const { dailyTankMultiplier, engineerName, engineerPosition } = settings;
   const printRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   
   const defaultValues = {
     datetime: '',
-    portside: { rpm: 1200.0, lo_press: 0.4, exhaust1: 350.0, exhaust2: 400.0, radiator: 68.0, sw_temp: 31.0, fw_coolers_in: 6765.0, fw_coolers_out: 6760.0, lo_coolers_in: 7570.0, lo_coolers_out: 7565.0 },
-    starboard: { rpm: 1200.0, lo_press: 0.4, exhaust1: 380.0, exhaust2: 380.0, radiator: 68.0, sw_temp: 31.0, fw_coolers_in: 6765.0, fw_coolers_out: 6760.0, lo_coolers_in: 7571.0, lo_coolers_out: 7566.0 },
-    generator: { lo_press: 0.36, fw_temp: 70.0, volts: 380.0, ampere: 10.0 },
-    flowmeter: { before: 29670.0, after: 29920.0 },
-    daily: { before: 64.5, after: 77.0 },
-    onduty: { before: 77.0 },
-    rob: 45914.0,
+    portside: { rpm: 0, lo_press: 0, exhaust1: 0, exhaust2: 0, radiator: 0, sw_temp: 0, fw_coolers_in: 0, fw_coolers_out: 0, lo_coolers_in: 0, lo_coolers_out: 0 },
+    starboard: { rpm: 0, lo_press: 0, exhaust1: 0, exhaust2: 0, radiator: 0, sw_temp: 0, fw_coolers_in: 0, fw_coolers_out: 0, lo_coolers_in: 0, lo_coolers_out: 0 },
+    generator: { lo_press: 0, fw_temp: 0, volts: 0, ampere: 0 },
+    flowmeter: { before: 0, after: 0 },
+    daily: { before: 0, after: 0 },
+    onduty: { before: 0 },
+    rob: 0,
     used4hours: 0,
     rob4hours: { hour1: 0, hour2: 0, hour3: 0, hour4: 0},
-    user: { date: '', name: 'Mr. Basuki', position: '3/E' },
+    user: { date: '', name: engineerName, position: engineerPosition },
     condition: 'Engine Room in Good condition'
   };
 
@@ -70,7 +68,9 @@ export default function PreviewPage() {
     const now = new Date();
     setValue('datetime', format(now, "yyyy-MM-dd'T'HH:mm"));
     setValue('user.date', format(now, 'MMMM d, yyyy'));
-  }, [setValue]);
+    setValue('user.name', engineerName);
+    setValue('user.position', engineerPosition);
+  }, [setValue, engineerName, engineerPosition]);
 
   useEffect(() => {
     const onduty = parseFloat(String(ondutyBefore).replace(',', '.')) || 0;
@@ -313,7 +313,4 @@ export default function PreviewPage() {
       </div>
     </div>
   );
-
-    
-
-
+}

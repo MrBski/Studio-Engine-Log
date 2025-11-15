@@ -40,6 +40,8 @@ export interface LastRecord {
 
 export interface AppSettings {
   dailyTankMultiplier: number;
+  engineerName: string;
+  engineerPosition: string;
 }
 
 // Context types
