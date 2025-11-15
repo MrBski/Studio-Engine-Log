@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { History, Archive, Gauge, ClipboardList, FileJson, Trash2, Eye } from 'lucide-react';
 import type { LastRecord } from '@/lib/types';
 import { useMemo, useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { EngineLogViewer } from '@/components/engine-log-viewer';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -54,7 +54,7 @@ export default function LastRecordPage() {
         }
 
         records.push({
-          id: `last-perf-${lastPerf.id}`,
+          id: lastPerf.id, // Use the original id for deletion
           type: type,
           summary: summary,
           timestamp: lastPerf.tanggal,
@@ -109,7 +109,7 @@ export default function LastRecordPage() {
   }
 
   return (
-    <Dialog onOpenChange={() => setSelectedLog(null)}>
+    <Dialog onOpenChange={(open) => !open && setSelectedLog(null)}>
         <div className="space-y-8">
         <div className="flex items-center gap-2">
             <History className="h-6 w-6 text-primary" />
@@ -173,7 +173,7 @@ export default function LastRecordPage() {
             <DialogTitle>Engine Log Preview</DialogTitle>
             </DialogHeader>
             <div className="max-h-[80vh] overflow-y-auto">
-                <EngineLogViewer data={selectedLog} />
+                {selectedLog && <EngineLogViewer data={selectedLog} />}
             </div>
         </DialogContent>
         </div>
