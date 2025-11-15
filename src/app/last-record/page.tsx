@@ -1,8 +1,9 @@
+
 'use client';
 
 import { useInventory, usePerforma, useEngineLog } from '@/hooks/use-app';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { History, Archive, Gauge, ClipboardList, FileJson, Trash2, Eye, Camera, Send, PackagePlus, PackageMinus } from 'lucide-react';
+import { History, Archive, Gauge, ClipboardList, FileJson, Trash2, Eye, Send, PackagePlus, PackageMinus } from 'lucide-react';
 import type { LastRecord } from '@/lib/types';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
@@ -10,9 +11,7 @@ import { EngineLogViewer } from '@/components/engine-log-viewer';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import html2canvas from 'html2canvas';
-import { saveAs } from 'file-saver';
-import { format } from 'date-fns';
+import { SnapshotButton } from '@/components/snapshot-button';
 
 
 export default function LogActivityPage() {
@@ -107,63 +106,6 @@ export default function LogActivityPage() {
         setSelectedLog(record.data);
     }
   }
-
-  const handleSaveToDevice = async () => {
-    const elementToCapture = printRef.current;
-    if (!elementToCapture) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Could not capture the log sheet.',
-      });
-      return;
-    }
-
-    toast({
-      title: 'Generating Image...',
-      description: 'Please wait while the log sheet is being captured.',
-    });
-
-    // Temporarily modify styles to capture full content
-    const originalStyle = {
-        maxHeight: elementToCapture.style.maxHeight,
-        overflowY: elementToCapture.style.overflowY,
-    };
-    elementToCapture.style.maxHeight = 'none';
-    elementToCapture.style.overflowY = 'visible';
-
-    try {
-      const canvas = await html2canvas(elementToCapture, {
-        useCORS: true,
-        scale: 2,
-        // Allow canvas to expand to fit all content
-        height: elementToCapture.scrollHeight,
-        windowHeight: elementToCapture.scrollHeight,
-      });
-
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-      if (blob) {
-        const now = new Date();
-        const fileName = `EngineLog_${format(now, 'yyyy-MM-dd_HH-mm-ss')}.png`;
-        saveAs(blob, fileName);
-        toast({
-          title: 'Image Saved!',
-          description: 'The log sheet has been saved to your device.',
-        });
-      }
-    } catch (error) {
-      console.error('Failed to save image:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error Saving Image',
-        description: 'Could not generate the image. Please try again.',
-      });
-    } finally {
-        // Restore original styles
-        elementToCapture.style.maxHeight = originalStyle.maxHeight;
-        elementToCapture.style.overflowY = originalStyle.overflowY;
-    }
-  };
   
   if (!isClient) {
     return (
@@ -251,10 +193,12 @@ export default function LogActivityPage() {
                 {selectedLog && <EngineLogViewer data={selectedLog} />}
             </div>
              <DialogFooter>
-                <Button type="button" size="lg" variant="outline" onClick={handleSaveToDevice}>
-                    <Camera className="mr-2 h-4 w-4" />
-                    Save to Device
-                </Button>
+                <SnapshotButton
+                    targetRef={printRef}
+                    fileNamePrefix="EngineLog"
+                    size="lg"
+                    variant="outline"
+                />
             </DialogFooter>
         </DialogContent>
         </div>

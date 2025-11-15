@@ -1,9 +1,8 @@
+
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import html2canvas from 'html2canvas';
-import { saveAs } from 'file-saver';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,11 +10,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { usePerforma, useSettings } from '@/hooks/use-app';
-import { Save, Camera as CameraIcon } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { PerformaRecord } from '@/lib/types';
 import { EngineLogViewer } from '@/components/engine-log-viewer';
+import { SnapshotButton } from '@/components/snapshot-button';
 
 const SectionTitle = ({ children, className }: { children: React.ReactNode; className?: string }) => (
   <h3 className={cn("font-bold text-center p-2 my-2 rounded-md text-primary-foreground text-sm", className)}>
@@ -123,61 +123,6 @@ export default function PreviewPage() {
         title: 'Error Saving Log',
         description: 'Could not save the log. Please try again.',
       });
-    }
-  };
-  
-  const handleSaveToDevice = async () => {
-    const elementToCapture = printRef.current;
-    if (!elementToCapture) {
-        toast({
-            variant: "destructive",
-            title: 'Error',
-            description: 'Could not capture the log sheet.',
-        });
-        return;
-    }
-    toast({
-        title: 'Generating Image...',
-        description: 'Please wait while the log sheet is being captured.',
-    });
-
-    const originalStyle = {
-      maxHeight: elementToCapture.style.maxHeight,
-      overflowY: elementToCapture.style.overflowY,
-    };
-    elementToCapture.style.maxHeight = 'none';
-    elementToCapture.style.overflowY = 'visible';
-
-    try {
-        const canvas = await html2canvas(elementToCapture, { 
-          useCORS: true, 
-          scale: 2,
-          backgroundColor: '#262A34', // Same as dark card
-          height: elementToCapture.scrollHeight,
-          windowHeight: elementToCapture.scrollHeight,
-        });
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-        if (blob) {
-            const now = new Date();
-            const fileName = `EngineLog_${format(now, 'yyyy-MM-dd_HH-mm-ss')}.png`;
-            saveAs(blob, fileName);
-            toast({
-                title: 'Image Saved!',
-                description: 'The log sheet has been saved to your device.',
-            });
-        }
-    } catch (error) {
-        console.error("Failed to save image:", error);
-        toast({
-            variant: "destructive",
-            title: 'Error Saving Image',
-            description: 'Could not generate the image. Please try again.',
-        });
-    } finally {
-      if(elementToCapture) {
-        elementToCapture.style.maxHeight = originalStyle.maxHeight;
-        elementToCapture.style.overflowY = originalStyle.overflowY;
-      }
     }
   };
 
@@ -295,10 +240,12 @@ export default function PreviewPage() {
           </div>
           
           <div className="text-center pt-4 flex justify-center gap-2">
-              <Button type="button" size="lg" variant="outline" onClick={handleSaveToDevice}>
-                  <CameraIcon className="mr-2 h-4 w-4" />
-                  Save to Device
-              </Button>
+              <SnapshotButton 
+                targetRef={printRef}
+                fileNamePrefix="EngineLog"
+                size="lg" 
+                variant="outline"
+              />
               <Button type="submit" size="lg">
                   <Save className="mr-2 h-4 w-4" />
                   Save Log
