@@ -2,7 +2,7 @@
 
 import { usePerforma } from '@/hooks/use-app';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Trash2, Gauge, Ban, FileJson } from 'lucide-react';
 import Link from 'next/link';
@@ -106,48 +106,48 @@ export default function PerformaPage() {
             </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-4">
           {sortedData.map((item) => (
-            <Card key={item.id} className="flex flex-col">
-              <CardHeader>
-                <CardTitle>{item.nama}</CardTitle>
-                <CardDescription>
-                  {new Date(item.tanggal).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex-grow space-y-2">
-                {isJsonString(item.keterangan) ? (
-                    <JsonViewer jsonData={item.keterangan} />
-                ) : (
-                    <>
-                      <p><span className="font-semibold text-muted-foreground">Quantity:</span> {item.jumlah}</p>
-                      {item.keterangan && <p><span className="font-semibold text-muted-foreground">Notes:</span> {item.keterangan}</p>}
-                    </>
-                )}
-              </CardContent>
-              <CardFooter className="flex justify-end">
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete this record?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will permanently delete the record named "{item.nama}".
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => deletePerformaRecord(item.id)}>
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </CardFooter>
+            <Card key={item.id}>
+              <div className="flex items-center p-4">
+                <div className="flex-1 space-y-1">
+                    <p className="font-semibold">{item.nama}</p>
+                    <p className="text-sm text-muted-foreground">
+                        {new Date(item.tanggal).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                </div>
+                <div className="flex items-center gap-2">
+                    {isJsonString(item.keterangan) ? (
+                        <JsonViewer jsonData={item.keterangan} />
+                    ) : (
+                        <div className="text-right">
+                          <p className="font-semibold">{item.jumlah}</p>
+                          {item.keterangan && <p className="text-sm text-muted-foreground truncate max-w-xs">{item.keterangan}</p>}
+                        </div>
+                    )}
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive flex-shrink-0">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete this record?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will permanently delete the record named "{item.nama}".
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => deletePerformaRecord(item.id)}>
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                </div>
+              </div>
             </Card>
           ))}
         </div>
