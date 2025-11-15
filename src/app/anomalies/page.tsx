@@ -14,9 +14,9 @@ import { useEngineLog } from '@/hooks/use-app';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const logEntrySchema = z.object({
-  oilPressure: z.coerce.number().min(0, "Invalid pressure"),
-  waterTemp: z.coerce.number().min(0, "Invalid temp"),
-  rpm: z.coerce.number().min(0, "Invalid RPM"),
+  oilPressure: z.coerce.number(),
+  waterTemp: z.coerce.number(),
+  rpm: z.coerce.number(),
 });
 
 const formSchema = z.object({
