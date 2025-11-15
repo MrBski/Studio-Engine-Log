@@ -13,7 +13,7 @@ const SectionTitle = ({ children, className }: { children: React.ReactNode; clas
 
 const DataRow = ({ label, value, className, valueClassName }: { label: string, value: any, className?: string, valueClassName?: string }) => {
     const displayValue = (val: any) => {
-        if (val === null || val === undefined || val === '' || isNaN(val)) return 'N/A';
+        if (val === null || val === undefined || val === '' || (typeof val === 'number' && isNaN(val))) return 'N/A';
         if (typeof val === 'number') {
            const fixedVal = val.toFixed(2).replace('.', ',');
            // remove trailing zeros from decimal part if it's .00
@@ -53,7 +53,7 @@ export function EngineLogViewer({ data }: { data: any }) {
   
   const parsedDate = data.datetime ? (typeof data.datetime === 'string' ? parseISO(data.datetime) : new Date(data.datetime)) : null;
   const formattedDateTime = parsedDate && isValid(parsedDate) ? format(parsedDate, "MM/dd/yyyy HH:mm") : 'N/A';
-  const formattedDate = parsedDate && isValid(parsedDate) ? format(parsedDate, "MMMM d, yyyy") : 'N/A';
+  const formattedDate = data.user?.date ? (isValid(parseISO(data.user.date)) ? format(parseISO(data.user.date), "MMMM d, yyyy") : data.user.date) : 'N/A';
 
   const flowmeterUsage = (data.flowmeter?.after ?? 0) - (data.flowmeter?.before ?? 0);
   const dailyUsageCm = (data.daily?.after ?? 0) - (data.daily?.before ?? 0);
@@ -61,9 +61,15 @@ export function EngineLogViewer({ data }: { data: any }) {
   const totalUsed = flowmeterUsage + dailyUsageLtrs;
 
   const renderExhaust = (exhaust1: number, exhaust2: number) => {
-      const val1 = String(exhaust1 ?? '0').replace('.',',');
-      const val2 = String(exhaust2 ?? '0').replace('.',',');
+      const val1 = String(exhaust1?.toFixed(2) ?? '0,00').replace('.',',');
+      const val2 = String(exhaust2?.toFixed(2) ?? '0,00').replace('.',',');
       return `${val1} / ${val2}`;
+  }
+
+  const renderCooler = (coolerIn: number, coolerOut: number) => {
+    const val1 = String(coolerIn?.toFixed(2) ?? '0,00').replace('.',',');
+    const val2 = String(coolerOut?.toFixed(2) ?? '0,00').replace('.',',');
+    return `${val1} / ${val2}`;
   }
 
   return (
@@ -83,8 +89,8 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <DataRow label="Exhaust" value={renderExhaust(data.portside.exhaust1, data.portside.exhaust2)} valueClassName="text-right"/>
                     <DataRow label="Radiator" value={data.portside.radiator} />
                     <DataRow label="SW Temp" value={data.portside.sw_temp} />
-                    <DataRow label="F.W. COOLERS" value={renderExhaust(data.portside.fw_coolers_in, data.portside.fw_coolers_out)} valueClassName="text-right" />
-                    <DataRow label="L.O. COOLERS" value={renderExhaust(data.portside.lo_coolers_in, data.portside.lo_coolers_out)} valueClassName="text-right" />
+                    <DataRow label="F.W. COOLERS" value={renderCooler(data.portside.fw_coolers_in, data.portside.fw_coolers_out)} valueClassName="text-right" />
+                    <DataRow label="L.O. COOLERS" value={renderCooler(data.portside.lo_coolers_in, data.portside.lo_coolers_out)} valueClassName="text-right" />
                 </div>
                 )}
 
@@ -96,8 +102,8 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <DataRow label="Exhaust" value={renderExhaust(data.starboard.exhaust1, data.starboard.exhaust2)} valueClassName="text-right"/>
                     <DataRow label="Radiator" value={data.starboard.radiator} />
                     <DataRow label="SW Temp" value={data.starboard.sw_temp} />
-                    <DataRow label="F.W. COOLERS" value={renderExhaust(data.starboard.fw_coolers_in, data.starboard.fw_coolers_out)} valueClassName="text-right"/>
-                    <DataRow label="L.O. COOLERS" value={renderExhaust(data.starboard.lo_coolers_in, data.starboard.lo_coolers_out)} valueClassName="text-right"/>
+                    <DataRow label="F.W. COOLERS" value={renderCooler(data.starboard.fw_coolers_in, data.starboard.fw_coolers_out)} valueClassName="text-right"/>
+                    <DataRow label="L.O. COOLERS" value={renderCooler(data.starboard.lo_coolers_in, data.starboard.lo_coolers_out)} valueClassName="text-right"/>
                 </div>
                 )}
 
@@ -122,8 +128,8 @@ export function EngineLogViewer({ data }: { data: any }) {
                            <DataCell className="text-muted-foreground">AFTER</DataCell>
                            <DataCell>{(data.daily.before ?? 0).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell>{(data.daily.after ?? 0).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{(dailyUsageCm * 21).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{(data.daily.after * 21).toFixed(1).replace('.',',')}</DataCell>
+                           <DataCell>{((data.daily.before ?? 0) * 21).toFixed(1).replace('.',',')}</DataCell>
+                           <DataCell>{((data.daily.after ?? 0) * 21).toFixed(1).replace('.',',')}</DataCell>
                         </DataGrid>
                     </div>
                 )}
@@ -140,7 +146,7 @@ export function EngineLogViewer({ data }: { data: any }) {
                 
                 <div className="space-y-1 p-1">
                     <DataGrid className="border-none">
-                        <DataCell span={2} className="bg-yellow-600/50 h-6 rounded-sm">{(totalUsed - data.used4hours).toFixed(1).replace('.',',')}</DataCell>
+                        <DataCell span={2} className="bg-yellow-600/50 h-6 rounded-sm">{(totalUsed).toFixed(1).replace('.',',')}</DataCell>
                     </DataGrid>
                 </div>
 
@@ -151,10 +157,10 @@ export function EngineLogViewer({ data }: { data: any }) {
                          <DataGrid>
                            <DataCell className="text-muted-foreground">BEFORE</DataCell>
                            <DataCell className="text-muted-foreground">AFTER</DataCell>
-                           <DataCell>{(data.daily.after ?? 0).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{(data.daily.before ?? 0).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{(data.daily.after * 21).toFixed(1).replace('.',',')}</DataCell>
-                           <DataCell>{(data.daily.before * 21).toFixed(1).replace('.',',')}</DataCell>
+                           <DataCell>{((data.onduty?.before ?? 0)).toFixed(1).replace('.',',')}</DataCell>
+                           <DataCell>{((data.daily.after ?? 0)).toFixed(1).replace('.',',')}</DataCell>
+                           <DataCell>{((data.onduty?.before ?? 0) * 21).toFixed(1).replace('.',',')}</DataCell>
+                           <DataCell>{((data.daily.after ?? 0) * 21).toFixed(1).replace('.',',')}</DataCell>
                            <DataCell>{dailyUsageLtrs.toFixed(1).replace('.',',')}</DataCell>
                            <DataCell>{flowmeterUsage.toFixed(1).replace('.',',')}</DataCell>
                         </DataGrid>
