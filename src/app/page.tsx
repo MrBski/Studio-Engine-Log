@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Gauge, List, History, Bot, Camera } from "lucide-react";
+import { Gauge, List, History, Bot, Camera, BarChart } from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -11,6 +11,12 @@ export default function HomePage() {
           <Link href="/preview">
             <Camera className="mr-4 h-8 w-8" />
             INPUT LOG
+          </Link>
+        </Button>
+         <Button asChild size="lg" className="w-full h-20 text-xl font-headline shadow-lg transition-transform hover:scale-105" variant="outline">
+          <Link href="/analysis">
+            <BarChart className="mr-4 h-8 w-8 text-primary" />
+            Analysis
           </Link>
         </Button>
         <Button asChild size="lg" className="w-full h-20 text-xl font-headline shadow-lg transition-transform hover:scale-105" variant="outline">

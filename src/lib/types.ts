@@ -31,7 +31,7 @@ export interface EngineLogRecord {
 
 export interface LastRecord {
     id: string;
-    type: 'Inventory' | 'Performa' | 'EngineLog' | 'Engine Log' | 'Restock' | 'Used';
+    type: 'Inventory' | 'Performa' | 'EngineLog' | 'Engine Log' | 'Restock' | 'Used' | 'Amprahan';
     summary: string;
     timestamp: string;
     category?: InventoryCategory;
@@ -78,3 +78,10 @@ export interface Anomaly {
 export interface DetectEngineAnomaliesOutput {
     anomalies: Anomaly[];
 }
+
+export type AnalysisContextType = {
+    anomalies: Anomaly[];
+    loading: boolean;
+    error: string | null;
+    detectAnomalies: (logData: any[]) => void;
+};

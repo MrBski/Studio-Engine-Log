@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Camera, Archive, Settings, Bot, History, Eye } from 'lucide-react';
+import { Home, Camera, Archive, Settings, Bot, History, Eye, BarChart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
@@ -10,7 +10,7 @@ const navItems = [
   { href: '/preview', icon: Camera, label: 'Input Data' },
   { href: '/last-record', icon: History, label: 'Log Activity' },
   { href: '/', icon: Home, label: 'Home' },
-  { href: '/inventory', icon: Archive, label: 'Inventory' },
+  { href: '/analysis', icon: BarChart, label: 'Analysis' },
   { href: '/settings', icon: Settings, label: 'Settings' },
 ];
 
