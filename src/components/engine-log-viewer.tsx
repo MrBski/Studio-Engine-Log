@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React from 'react';
@@ -154,8 +155,9 @@ export function EngineLogViewer({ data }: { data: any }) {
                     </div>
                 )}
                 
-                <div className="space-y-1 p-1">
-                    <DataGrid className="border-none">
+                <div className="space-y-1 p-1 border border-muted-foreground/50 rounded-sm">
+                    <SectionTitle className="bg-yellow-600">Difference</SectionTitle>
+                    <DataGrid className='border-none'>
                         <DataCell span={2} className="bg-yellow-600/50 h-6 rounded-sm">{(usageDifference).toFixed(1).replace('.',',')}</DataCell>
                     </DataGrid>
                 </div>
