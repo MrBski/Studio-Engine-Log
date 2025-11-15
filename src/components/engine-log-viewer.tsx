@@ -54,7 +54,7 @@ export function EngineLogViewer({ data }: { data: any }) {
   const flowmeterUsage = (data.flowmeter?.after ?? 0) - (data.flowmeter?.before ?? 0);
   const dailyUsageCm = (data.daily?.after ?? 0) - (data.daily?.before ?? 0);
   const dailyUsageLtrs = dailyUsageCm * 21;
-  const totalUsed = flowmeterUsage + dailyUsageLtrs;
+  const usageDifference = dailyUsageLtrs - flowmeterUsage;
 
   const renderExhaust = (exhaust1: number, exhaust2: number) => {
       const val1 = String(exhaust1?.toFixed(1) ?? '0,0').replace('.',',');
@@ -151,7 +151,7 @@ export function EngineLogViewer({ data }: { data: any }) {
                 
                 <div className="space-y-1 p-1">
                     <DataGrid className="border-none">
-                        <DataCell span={2} className="bg-yellow-600/50 h-6 rounded-sm">{(totalUsed).toFixed(1).replace('.',',')}</DataCell>
+                        <DataCell span={2} className="bg-yellow-600/50 h-6 rounded-sm">{(usageDifference).toFixed(1).replace('.',',')}</DataCell>
                     </DataGrid>
                 </div>
 
@@ -176,7 +176,7 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <SectionTitle className="bg-gray-500">ROB</SectionTitle>
                     <DataGrid className="border-none">
                         <DataCell>{(data.rob ?? 0).toFixed(1).replace('.',',')}</DataCell>
-                        <DataCell>{(data.rob - totalUsed).toFixed(1).replace('.',',')}</DataCell>
+                        <DataCell>{(data.rob - flowmeterUsage).toFixed(1).replace('.',',')}</DataCell>
                     </DataGrid>
                 </div>
             </div>
