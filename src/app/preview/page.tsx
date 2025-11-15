@@ -39,8 +39,8 @@ export default function PreviewPage() {
   
   const defaultValues = {
     datetime: '',
-    portside: { rpm: 1200.0, lo_press: 0.4, exhaust1: 350.0, exhaust2: 400.0, radiator: 68.0, sw_temp: 31.0, fw_coolers: 6765.0, lo_coolers: 7570.0 },
-    starboard: { rpm: 1200.0, lo_press: 0.4, exhaust1: 380.0, exhaust2: 380.0, radiator: 68.0, sw_temp: 31.0, fw_coolers: 6765.0, lo_coolers: 7571.0 },
+    portside: { rpm: 1200.0, lo_press: 0.4, exhaust1: 350.0, exhaust2: 400.0, radiator: 68.0, sw_temp: 31.0, fw_coolers_in: 6765.0, fw_coolers_out: 6760.0, lo_coolers_in: 7570.0, lo_coolers_out: 7565.0 },
+    starboard: { rpm: 1200.0, lo_press: 0.4, exhaust1: 380.0, exhaust2: 380.0, radiator: 68.0, sw_temp: 31.0, fw_coolers_in: 6765.0, fw_coolers_out: 6760.0, lo_coolers_in: 7571.0, lo_coolers_out: 7566.0 },
     generator: { lo_press: 0.36, fw_temp: 70.0, volts: 380.0, ampere: 10.0 },
     flowmeter: { before: 29670.0, after: 29920.0 },
     daily: { before: 64.5, after: 77.0 },
@@ -90,7 +90,8 @@ export default function PreviewPage() {
   };
   
   const handleSaveToDevice = async () => {
-    if (!printRef.current) {
+    const elementToCapture = printRef.current;
+    if (!elementToCapture) {
         toast({
             variant: "destructive",
             title: 'Error',
@@ -102,8 +103,21 @@ export default function PreviewPage() {
         title: 'Generating Image...',
         description: 'Please wait while the log sheet is being captured.',
     });
+
+    const originalStyle = {
+      maxHeight: elementToCapture.style.maxHeight,
+      overflowY: elementToCapture.style.overflowY,
+    };
+    elementToCapture.style.maxHeight = 'none';
+    elementToCapture.style.overflowY = 'visible';
+
     try {
-        const canvas = await html2canvas(printRef.current, { useCORS: true, scale: 2 });
+        const canvas = await html2canvas(elementToCapture, { 
+          useCORS: true, 
+          scale: 2,
+          height: elementToCapture.scrollHeight,
+          windowHeight: elementToCapture.scrollHeight,
+        });
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
         if (blob) {
             const now = new Date();
@@ -121,6 +135,9 @@ export default function PreviewPage() {
             title: 'Error Saving Image',
             description: 'Could not generate the image. Please try again.',
         });
+    } finally {
+      elementToCapture.style.maxHeight = originalStyle.maxHeight;
+      elementToCapture.style.overflowY = originalStyle.overflowY;
     }
   };
 
@@ -167,8 +184,10 @@ export default function PreviewPage() {
                           <DataRow label="Exhaust 2">{renderInput('portside.exhaust2')}</DataRow>
                           <DataRow label="Radiator">{renderInput('portside.radiator')}</DataRow>
                           <DataRow label="SW Temp">{renderInput('portside.sw_temp')}</DataRow>
-                          <DataRow label="F.W. COOLERS">{renderInput('portside.fw_coolers')}</DataRow>
-                          <DataRow label="L.O. COOLERS">{renderInput('portside.lo_coolers')}</DataRow>
+                          <DataRow label="F.W. COOLERS In">{renderInput('portside.fw_coolers_in')}</DataRow>
+                          <DataRow label="F.W. COOLERS Out">{renderInput('portside.fw_coolers_out')}</DataRow>
+                          <DataRow label="L.O. COOLERS In">{renderInput('portside.lo_coolers_in')}</DataRow>
+                          <DataRow label="L.O. COOLERS Out">{renderInput('portside.lo_coolers_out')}</DataRow>
                       </div>
 
                       <div className="space-y-3">
@@ -179,8 +198,10 @@ export default function PreviewPage() {
                           <DataRow label="Exhaust 2">{renderInput('starboard.exhaust2')}</DataRow>
                           <DataRow label="Radiator">{renderInput('starboard.radiator')}</DataRow>
                           <DataRow label="SW Temp">{renderInput('starboard.sw_temp')}</DataRow>
-                          <DataRow label="F.W. COOLERS">{renderInput('starboard.fw_coolers')}</DataRow>
-                          <DataRow label="L.O. COOLERS">{renderInput('starboard.lo_coolers')}</DataRow>
+                          <DataRow label="F.W. COOLERS In">{renderInput('starboard.fw_coolers_in')}</DataRow>
+                          <DataRow label="F.W. COOLERS Out">{renderInput('starboard.fw_coolers_out')}</DataRow>
+                          <DataRow label="L.O. COOLERS In">{renderInput('starboard.lo_coolers_in')}</DataRow>
+                          <DataRow label="L.O. COOLERS Out">{renderInput('starboard.lo_coolers_out')}</DataRow>
                       </div>
 
                       <div className="space-y-3">

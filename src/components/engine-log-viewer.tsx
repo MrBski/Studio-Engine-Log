@@ -53,8 +53,10 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <DataRow label="Exhaust 2" value={data.portside.exhaust2} />
                     <DataRow label="Radiator" value={data.portside.radiator} />
                     <DataRow label="SW Temp" value={data.portside.sw_temp} />
-                    <DataRow label="F.W. COOLERS" value={data.portside.fw_coolers} />
-                    <DataRow label="L.O. COOLERS" value={data.portside.lo_coolers} />
+                    <DataRow label="F.W. COOLERS In" value={data.portside.fw_coolers_in} />
+                    <DataRow label="F.W. COOLERS Out" value={data.portside.fw_coolers_out} />
+                    <DataRow label="L.O. COOLERS In" value={data.portside.lo_coolers_in} />
+                    <DataRow label="L.O. COOLERS Out" value={data.portside.lo_coolers_out} />
                 </div>
                 )}
 
@@ -67,8 +69,10 @@ export function EngineLogViewer({ data }: { data: any }) {
                     <DataRow label="Exhaust 2" value={data.starboard.exhaust2} />
                     <DataRow label="Radiator" value={data.starboard.radiator} />
                     <DataRow label="SW Temp" value={data.starboard.sw_temp} />
-                    <DataRow label="F.W. COOLERS" value={data.starboard.fw_coolers} />
-                    <DataRow label="L.O. COOLERS" value={data.starboard.lo_coolers} />
+                    <DataRow label="F.W. COOLERS In" value={data.starboard.fw_coolers_in} />
+                    <DataRow label="F.W. COOLERS Out" value={data.starboard.fw_coolers_out} />
+                    <DataRow label="L.O. COOLERS In" value={data.starboard.lo_coolers_in} />
+                    <DataRow label="L.O. COOLERS Out" value={data.starboard.lo_coolers_out} />
                 </div>
                 )}
                 
