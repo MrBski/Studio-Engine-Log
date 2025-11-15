@@ -80,6 +80,11 @@ export function EngineLogViewer({ data }: { data: any }) {
       if (Number.isInteger(num)) return String(num);
       return num.toFixed(1).replace('.', ',');
   }
+  
+  const formatRoundedNumber = (num: number) => {
+    if (num === null || num === undefined || isNaN(num)) return 'N/A';
+    return String(Math.round(num));
+  }
 
   const renderExhaust = (exhaust1: number, exhaust2: number) => {
       const val1 = formatNumber(exhaust1);
@@ -191,7 +196,7 @@ export function EngineLogViewer({ data }: { data: any }) {
                             </DataGrid>
                             <SectionTitle className="bg-blue-800 mt-2">Pembulatan</SectionTitle>
                              <DataGrid className="border-none">
-                                <DataCell span={2} className="bg-blue-800/50 h-6 rounded-sm">{formatNumber(roundedHourlyUsage)} ltrs/jam</DataCell>
+                                <DataCell span={2} className="bg-blue-800/50 h-6 rounded-sm">{formatRoundedNumber(roundedHourlyUsage)} ltrs/jam</DataCell>
                             </DataGrid>
                         </div>
                     </div>

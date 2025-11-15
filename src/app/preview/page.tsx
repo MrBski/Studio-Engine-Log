@@ -38,6 +38,11 @@ export default function PreviewPage() {
   const { dailyTankMultiplier, engineerName, engineerPosition } = settings;
   const printRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   
   const defaultValues = {
     datetime: '',
@@ -149,6 +154,10 @@ export default function PreviewPage() {
   const renderReadOnlyInput = (name: any) => (
     <Input {...register(name)} type="tel" className="bg-card-foreground/10 h-8 text-right text-sm font-bold" readOnly />
   );
+
+  if (!isClient) {
+    return null; // Or a loading skeleton
+  }
 
   return (
     <div className="space-y-4 pb-8">
