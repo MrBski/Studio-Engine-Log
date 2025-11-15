@@ -14,7 +14,7 @@ export interface PerformaRecord {
   id: string;
   nama: string;
   tanggal: string;
-  keterangan: string;
+  keterangan: string; // Will store the full JSON log
   jumlah: number;
 }
 
@@ -31,7 +31,7 @@ export interface EngineLogRecord {
 
 export interface LastRecord {
     id: string;
-    type: 'Inventory' | 'Performa' | 'EngineLog';
+    type: 'Inventory' | 'Performa' | 'EngineLog' | 'Engine Log';
     summary: string;
     timestamp: string;
 }
@@ -62,3 +62,5 @@ export type EngineLogContextType = {
   engineLogs: EngineLogRecord[];
   addEngineLog: (sections: EngineLogSection[]) => void;
 };
+
+    

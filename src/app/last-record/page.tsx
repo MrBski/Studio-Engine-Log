@@ -2,7 +2,7 @@
 
 import { useInventory, usePerforma, useEngineLog } from '@/hooks/use-app';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { History, Archive, Gauge, ClipboardList } from 'lucide-react';
+import { History, Archive, Gauge, ClipboardList, FileJson } from 'lucide-react';
 import type { LastRecord } from '@/lib/types';
 import { useMemo } from 'react';
 
@@ -10,6 +10,15 @@ export default function LastRecordPage() {
   const { inventory } = useInventory();
   const { performaRecords } = usePerforma();
   const { engineLogs } = useEngineLog();
+
+  const isJsonString = (str: string) => {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+  }
 
   const lastRecords = useMemo<LastRecord[]>(() => {
     const records: LastRecord[] = [];
@@ -29,10 +38,18 @@ export default function LastRecordPage() {
     if (performaRecords.length > 0) {
        const lastPerf = [...performaRecords].sort((a,b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime())[0];
       if (lastPerf) {
+        let type: LastRecord['type'] = 'Performa';
+        let summary = `Record "${lastPerf.nama}" for ${lastPerf.jumlah}`;
+        
+        if (isJsonString(lastPerf.keterangan)) {
+          type = 'Engine Log';
+          summary = lastPerf.nama;
+        }
+
         records.push({
           id: `last-perf-${lastPerf.id}`,
-          type: 'Performa',
-          summary: `Record "${lastPerf.nama}" for ${lastPerf.jumlah}`,
+          type: type,
+          summary: summary,
           timestamp: lastPerf.tanggal,
         });
       }
@@ -58,6 +75,7 @@ export default function LastRecordPage() {
         case 'Inventory': return <Archive className="h-4 w-4 text-muted-foreground" />;
         case 'Performa': return <Gauge className="h-4 w-4 text-muted-foreground" />;
         case 'EngineLog': return <ClipboardList className="h-4 w-4 text-muted-foreground" />;
+        case 'Engine Log': return <FileJson className="h-4 w-4 text-muted-foreground" />;
         default: return null;
     }
   }
@@ -94,3 +112,5 @@ export default function LastRecordPage() {
     </div>
   );
 }
+
+    
