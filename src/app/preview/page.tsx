@@ -145,11 +145,35 @@ export default function PreviewPage() {
     }
   };
 
-  const renderInput = (name: any) => (
-    <Input {...register(name, {
-        setValueAs: v => parseFloat(String(v).replace(',', '.')) || 0
-    })} type="tel" inputMode="decimal" className="bg-card-foreground/5 h-8 text-right text-sm" onKeyDown={handleKeyDown}/>
-  );
+ const renderInput = (name: any) => (
+  <Controller
+    name={name}
+    control={control}
+    render={({ field }) => (
+      <Input
+        {...field}
+        type="tel"
+        inputMode="decimal"
+        className="bg-card-foreground/5 h-8 text-right text-sm"
+        onKeyDown={handleKeyDown}
+        value={field.value === 0 ? "" : field.value}
+        onChange={(e) => {
+          const val = e.target.value;
+
+          // Jika input kosong → set sebagai 0 tapi tidak tampil di UI
+          if (val.trim() === "") {
+            field.onChange(0);
+            return;
+          }
+
+          // Jika angka → convert
+          field.onChange(parseFloat(val.replace(",", ".")));
+        }}
+      />
+    )}
+  />
+);
+
   
   const renderReadOnlyInput = (name: any) => (
     <Input {...register(name)} type="tel" className="bg-card-foreground/10 h-8 text-right text-sm font-bold" readOnly />
