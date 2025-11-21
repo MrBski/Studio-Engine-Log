@@ -1,4 +1,4 @@
-# **App Name**: SeaPilotPro
+# **App Name**: ENGINE-LOG
 
 ## Core Features:
 
@@ -7,7 +7,6 @@
 - Performa Tracking: Tracks vessel performance data such as fuel consumption, speed, and voyage details.
 - Data Synchronization: Allows users to import, export, and sync data with a server or local files for backup and sharing.
 - Snapshot Saving: Allows users to take snapshop images of the performed calculations using html2canvas. Snapshots can be used to look up historical information of performed calculations.
-- Anomaly Detection Tool: AI-powered tool that analyzes engine log data and identifies potential anomalies or deviations from normal operating parameters, suggesting possible causes and recommended actions. The tool will look for drops in pressure, spikes in temperature or pressure, changes in fuel usage etc.
 
 ## Style Guidelines:
 
